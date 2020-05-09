@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+	<head>
+			<!-- Required meta tags -->
+      <meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+			<!-- Bootstrap CSS -->
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+			<title>Flights Control</title>
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	</head>
+	<body>
+  	<div class="container">
+      <div class="row">
+        <div class="col-md-12">
+        <!-- place to show errors-->
+        <div id="error-displayer" class="alert alert-danger" role="alert">
+          Errors will display here
+        </div>
+      </div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-9">
+          <div class="row">
+            <div class="col-md-12">
+						<!-- map item -->
+  						<div id="map-item">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://product-image.juniqe-production.juniqe.com/media/catalog/product/seo-cache/x800/92/253/92-253-101L/World-Map-Naxart-Poster.jpg">
+                        <p>iframes are not supported by your browser.</p>
+                    </iframe>
+                </div>
+  						</div>
+            </div>
+          </div>
+					<div class="row">
+            <div class="col-md-12">
+						<!-- flight item -->
+						<div id="flight-item">
+              <div class="jumbotron">
+                <h2>
+                  Flight Details
+                </h2>
+                <p>
+                  Company, duration, departue, arrival, from, to, number of passengers
+                </p>
+                <p>
+                  <a class="btn btn-primary btn-large" href="#">close</a>
+                </p>
+              </div>
+						</div>
+          </div>
+				  </div>
+				</div>
+				<div class="col-md-3">
+					
+          <!-- list of flights -->	
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action list-group-item-dark d-flex justify-content-between align-items-center">
+              internal flights
+              <span class="badge badge-primary badge-pill" id="internal-flights-n">14</span>
+            </li>
+            <li class="list-group-item list-group-item-action list-group-item-light">
+              <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              flight one
+            </li>
+            <li class="list-group-item list-group-item-action list-group-item-light">
+              <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              flight two
+            </li>
+            <li class="list-group-item d-flex list-group-item-action list-group-item-dark justify-content-between align-items-center">
+              external flights
+              <span class="badge badge-primary badge-pill" id="external-flights-n">12</span>
+            </li>
+            <li class="list-group-item list-group-item-action list-group-item-light">
+              flight three
+            </li>
+            <li class="list-group-item list-group-item-action list-group-item-light">
+              flight four
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>	
+
+				<!-- Optional JavaScript -->
+				<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+				<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+				<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+				<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="    sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+				<script src="app.js"></script>
+		</body>
+</html>
