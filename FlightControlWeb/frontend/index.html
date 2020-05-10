@@ -15,6 +15,7 @@
   	<div class="container">
       <div class="row">
         <div class="col-md-12">
+
         <!-- place to show errors-->
         <div id="error-displayer" class="alert alert-danger" role="alert">
           Errors will display here
@@ -39,29 +40,83 @@
 					<div class="row">
             <div class="col-md-12">
 						<!-- flight item -->
-						<div id="flight-item">
               <div class="jumbotron">
                 <h2>
                   Flight Details
                 </h2>
-                <p>
+                <p id="flight_info">
                   Company, duration, departue, arrival, from, to, number of passengers
                 </p>
                 <p>
-                  <a class="btn btn-primary btn-large" href="#">close</a>
+                  <a class="btn btn-primary btn-danger" display="none" href="#">Delete</a>
+                  <a class="btn btn-primary btn-dark" href="#">Close</a>
                 </p>
               </div>
-						</div>
           </div>
 				  </div>
 				</div>
 				<div class="col-md-3">
-					
-          <!-- list of flights -->	
-          <ul class="list-group">
+
+          <div class="accordion" id="internal_flights_accordion">
+            <div class="card">
+              <div class="card-header button" id="heading_1" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" aria-controls="collapse_1">
+                  Internal Flights 
+                  <span class="badge badge-primary badge-pill badge-dark float-right m-1" id="internal_flights_n">14</span>
+              </div>
+              <div id="collapse_1" class="collapse" aria-labelledby="heading_1" data-parent="#internal_flights_accordion">
+                <ul class="list-group list-group-flush">
+                  <li id="internal_1" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_1_1">
+                    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    internal flight 1
+                  </li>
+                  <li id="internal_2" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_1_2">
+                    <button type="button" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span></button>
+                    internal flight 2
+                  </li>
+                  <li id="internal_3" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_1_3">
+                    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    internal flight 3
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion" id="external_flights_accordion">
+            <div class="card">
+              <div class="card-header button" id="heading_2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="true" aria-controls="collapse_2">
+                  Internal Flights 
+                  <span class="badge badge-primary badge-pill badge-dark float-right m-1" id="external_flights_n">14</span>
+              </div>
+              <div id="collapse_2" class="collapse" aria-labelledby="heading_1" data-parent="#external_flights_accordion">
+                <ul class="list-group list-group-flush">
+                  <li id="external_1" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_2_1">
+                    external flight 1
+                  </li>
+                  <li id="external_2" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_2_2">
+                    external flight 2
+                  </li>
+                  <li id="external_3" type="button" class="list-group-item list-group-item-action"
+                                data-toggle="collapse" data-target="#collapse_2_3">
+                    external flight 3
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+<!--
+          <ul class="panel list-group">
             <li class="list-group-item list-group-item-action list-group-item-dark d-flex justify-content-between align-items-center">
-              internal flights
-              <span class="badge badge-primary badge-pill" id="internal-flights-n">14</span>
+              <a href="#web_dev" data-parent="#accordion" data-toggle="collapse" class="list-group-item">
+                <h4>Internal Flights</h4>
+                <span class="badge badge-primary badge-pill" id="internal-flights-n">14</span>
+              </a>
+              
             </li>
             <li class="list-group-item list-group-item-action list-group-item-light">
               <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -69,8 +124,11 @@
             </li>
             <li class="list-group-item list-group-item-action list-group-item-light">
               <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              flight two
+              flight twoa
             </li>
+          </ul>
+
+          <ul class="panel list-group">
             <li class="list-group-item d-flex list-group-item-action list-group-item-dark justify-content-between align-items-center">
               external flights
               <span class="badge badge-primary badge-pill" id="external-flights-n">12</span>
@@ -82,7 +140,7 @@
               flight four
             </li>
           </ul>
-
+-->
         </div>
       </div>
     </div>	
