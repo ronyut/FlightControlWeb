@@ -30,7 +30,8 @@ namespace FlightControlWeb
             services.AddControllers();
          
             // add my services
-            services.AddScoped<IFcwRepo, MockFcwRepo>();
+            //services.AddScoped<IFcwRepo, MockFcwRepo>();
+            services.AddScoped<IFcwRepo, SqliteFcwRepo>();
 
             // add DB context
             var connection = Configuration.GetConnectionString("FcwConnection");
