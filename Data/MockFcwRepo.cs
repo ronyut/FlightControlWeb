@@ -7,11 +7,18 @@ namespace FlightControlWeb.Data
     {
         public IEnumerable<FlightPlan> GetAllFlightPlans()
         {
+            IEnumerable<Segment> segments = new List<Segment>{
+                new Segment(35, 35, 100),
+                new Segment(36, 36, 20)
+            };
+
+            InitialLocation initial_location = new InitialLocation(34, 34, "2020-05-22T15:30:00Z");
+
             var flightPlans = new List<FlightPlan>
             {
-                new FlightPlan(0, 222, "El Al 0"),
-                new FlightPlan(1, 333, "El Al 1"),
-                new FlightPlan(2, 444, "El Al 2")
+                new FlightPlan(0, 222, "El Al 0", initial_location, segments),
+                new FlightPlan(1, 333, "El Al 1", initial_location, segments),
+                new FlightPlan(2, 444, "El Al 2", initial_location, segments)
             };
 
             return flightPlans;
@@ -19,7 +26,13 @@ namespace FlightControlWeb.Data
 
         public FlightPlan GetFlightPlanById(int id)
         {
-            return new FlightPlan(0, 222, "El Al 0");
+            IEnumerable<Segment> segments = new List<Segment>{
+                new Segment(35, 35, 100),
+                new Segment(36, 36, 20)
+            };
+
+            InitialLocation initial_location = new InitialLocation(34, 34, "2020-05-22T15:30:00Z");
+            return new FlightPlan(0, 222, "El Al 0", initial_location, segments);
         }
     }
 }
