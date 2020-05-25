@@ -20,7 +20,7 @@ namespace FlightControlWeb.Controllers
 
         // GET api/FlightPlan
         [HttpGet]
-        public ActionResult <IEnumerable<FlightPlan>> GetAllFlightPlans()
+        public ActionResult<IEnumerable<FlightPlan>> GetAllFlightPlans()
         {
             var items = _repository.GetAllFlightPlans();
             return Ok(items);
@@ -28,10 +28,17 @@ namespace FlightControlWeb.Controllers
 
         // GET api/FlightPlan/{id}
         [HttpGet("{id}")]
-        public ActionResult <FlightPlan> GetFlightPlanById(string id)
+        public ActionResult<FlightPlan> GetFlightPlanById(string id)
         {
             var item = _repository.GetFlightPlanById(id);
             return Ok(item);
+        }
+
+        [HttpPost]
+        public ActionResult<Response> PostFlightPlan([FromBody] string jsonString)
+        {
+            var response = _repository.PostFlightPlan(jsonString);
+            return Ok(response);
         }
     }
 }

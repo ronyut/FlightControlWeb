@@ -60,7 +60,12 @@ namespace FlightControlWeb.Data
                 connection.Open();
 
                 var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix + " AND is_external = " + Util.BoolToInt(isExternal);
+                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix;
+                if (!isExternal)
+                {
+                    cmd.CommandText += " AND is_external = 0";
+                }
+
                 using(var reader = cmd.ExecuteReader())
                 {
                     while(reader.Read())
@@ -91,5 +96,34 @@ namespace FlightControlWeb.Data
             return segments;
         }
 
+        public Response DeleteFlightById(string id)
+        {
+            var affectedRowsNum = 0;
+            var request = "DELETE";
+            using(var connection = _context.conn)
+            {
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText  = "DELETE FROM flights WHERE flight_name = '" + id + "'";
+                affectedRowsNum = cmd.ExecuteNonQuery();
+            }
+
+            if (affectedRowsNum != 1)
+            {
+                return new Response(request, false, "Flight ID does not exist");
+            }
+            else
+            {
+                return new Response(request, true, "The flight has been successfully deleted");
+            }
+
+            
+        }
+
+        public Response PostFlightPlan(string json)
+        {
+            Console.WriteLine(json);
+            return new Response("POST", false, "NaN");
+        }
     }
 }

@@ -44,5 +44,15 @@ namespace FlightControlWeb.Data
 
             return flights;
         }
+
+        public Response DeleteFlightById(string id)
+        {
+            return new Response("DELETE", true, "The flight has been deleted");
+        }
+
+        public Response PostFlightPlan(string jsonString)
+        {
+            return new Response("POST", true, "The flight plan has been added");
+        }
     }
 }
