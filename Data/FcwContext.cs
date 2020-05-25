@@ -8,6 +8,7 @@ namespace FlightControlWeb.Data
     public class FcwContext : DbContext
     {
         public SqliteConnection _conn { get; set; }
+        //public DbSet<FlightPlan> FlightPlans { get; set; }
 
         public FcwContext(DbContextOptions<FcwContext> opt) : base(opt)
         {
@@ -16,6 +17,5 @@ namespace FlightControlWeb.Data
             _conn = new SqliteConnection(connectionStringBuilder.ConnectionString);
         }
 
-        //public DbSet<FlightPlan> FlightPlans { get; set; }
     }
 }

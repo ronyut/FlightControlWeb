@@ -16,38 +16,36 @@ namespace FlightControlWeb.Data
 
         public IEnumerable<FlightPlan> GetAllFlightPlans()
         {
-            //return _context.FlightPlans.ToList();
-            using(var connection = _context._conn)
-            {
-                connection.Open();
-
-                var tableCmd = connection.CreateCommand();
-                tableCmd.CommandText = "CREATE table beers(name VARCHAR(50))";
-                tableCmd.ExecuteNonQuery();
-            }
-
-            IEnumerable<Segment> segments = new List<Segment>{
-                new Segment(35, 35, 100),
-                new Segment(36, 36, 20)
-            };
-
-            InitialLocation initial_location = new InitialLocation(34, 34, "2020-05-22T15:30:00Z");
-
-            var flightPlans = new List<FlightPlan>
-            {
-                new FlightPlan(0, 222, "El Al 0", initial_location, segments),
-                new FlightPlan(1, 333, "El Al 1", initial_location, segments),
-                new FlightPlan(2, 444, "El Al 2", initial_location, segments)
-            };
-
-            return flightPlans;
-
+            throw new Exception("Not implemented!");
         }
 
         public FlightPlan GetFlightPlanById(int id)
         {
-            //return _context.FlightPlans.FirstOrDefault(p => p.flight_id == id);
-            throw new Exception("Err meow!");
+            throw new Exception("Not implemented!");
+        }
+
+        public IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal)
+        {
+            var relativeTo = new MyDateTime(date);
+            var flights = new List<Flight> {};
+
+            using(var connection = _context._conn)
+            {
+                connection.Open();
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix + " AND is_external = " + isExternal;
+                using(var reader = cmd.ExecuteReader())
+                {
+                    while(reader.Read())
+                    {
+                        var fd = new FlightCalcData(reader, connection, relativeTo);
+                        var flight = new Flight(fd.flight_id, fd.longitude, fd.latitude, fd.passengers, fd.company_name, relativeTo, isExternal);
+                        flights.Add(flight);
+                    }
+                }
+            }
+            return flights;
         }
 
     }

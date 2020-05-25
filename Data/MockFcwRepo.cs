@@ -16,9 +16,9 @@ namespace FlightControlWeb.Data
 
             var flightPlans = new List<FlightPlan>
             {
-                new FlightPlan(0, 222, "El Al 0", initial_location, segments),
-                new FlightPlan(1, 333, "El Al 1", initial_location, segments),
-                new FlightPlan(2, 444, "El Al 2", initial_location, segments)
+                new FlightPlan(222, "El Al 0", initial_location, segments),
+                new FlightPlan(333, "El Al 1", initial_location, segments),
+                new FlightPlan(444, "El Al 2", initial_location, segments)
             };
 
             return flightPlans;
@@ -32,7 +32,17 @@ namespace FlightControlWeb.Data
             };
 
             InitialLocation initial_location = new InitialLocation(34, 34, "2020-05-22T15:30:00Z");
-            return new FlightPlan(0, 222, "El Al 0", initial_location, segments);
+            return new FlightPlan(222, "El Al 0", initial_location, segments);
+        }
+
+        public IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal)
+        {
+            var flights = new List<Flight>{
+                new Flight("FOJI88", 38, -38, 1000, "Air France", new MyDateTime("2020-05-25T11:33:00Z"), false),
+                new Flight("POLA11", 22.1, -23.8, 1, "Swiss Air", new MyDateTime("2020-05-25T11:33:01Z"), false),
+            };
+
+            return flights;
         }
     }
 }

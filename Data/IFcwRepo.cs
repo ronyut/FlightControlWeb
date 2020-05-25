@@ -7,5 +7,6 @@ namespace FlightControlWeb.Data
     {
         IEnumerable<FlightPlan> GetAllFlightPlans();
         FlightPlan GetFlightPlanById(int id);
+        IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal);
     }
 }
