@@ -18,5 +18,11 @@ namespace FlightControlWeb.Models
             this.longitude = Double.Parse(longitude);
             this.latitude = Double.Parse(latitude);
         }
+
+        public Coordinate(object longitude, object latitude)
+        {
+            this.longitude = (double) longitude;
+            this.latitude = (double) latitude;
+        }
     }
 }

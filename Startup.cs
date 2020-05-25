@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using FlightControlWeb.Models;
 
 namespace FlightControlWeb
 {
@@ -27,14 +28,14 @@ namespace FlightControlWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            // add Json.NET
+            services.AddControllers().AddNewtonsoftJson();
          
             // add my services
-            //services.AddScoped<IFcwRepo, MockFcwRepo>();
             services.AddScoped<IFcwRepo, SqliteFcwRepo>();
 
             // add DB context
-            var connection = Configuration.GetConnectionString("FcwConnection");
+            var connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<FcwContext>(options => options.UseSqlite(connection));
         }
 
@@ -46,7 +47,7 @@ namespace FlightControlWeb
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using FlightControlWeb.Models;
+using Microsoft.Data.Sqlite;
 
 namespace FlightControlWeb.Data
 {
@@ -14,14 +14,40 @@ namespace FlightControlWeb.Data
             _context = context;
         }
 
+        public object At(string column, SqliteDataReader reader)
+        {
+            return reader.GetValue(reader.GetOrdinal(column));
+        }
+
         public IEnumerable<FlightPlan> GetAllFlightPlans()
         {
             throw new Exception("Not implemented!");
         }
 
-        public FlightPlan GetFlightPlanById(int id)
+        public FlightPlan GetFlightPlanById(string id)
         {
-            throw new Exception("Not implemented!");
+            FlightPlan flightPlan = null;
+            using(var connection = _context.conn)
+            {
+                connection.Open();
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT * FROM flights WHERE flight_name = '" + id + "' LIMIT 1";
+                using(var reader = cmd.ExecuteReader())
+                {
+                    while(reader.Read())
+                    {
+                        var flightPk = (int)(long) At("flight_id", reader);
+                        var passengers = (int)(long) At("passengers", reader);
+                        var company = (string) At("company", reader);
+                        var coord = new Coordinate(At("longitude", reader), At("latitude", reader));
+                        var initialLocation = new InitialLocation(coord, (string) At("takeoff", reader));
+                        var segments = GetSegmentsByFlightPk(flightPk, connection);
+                        flightPlan = new FlightPlan(passengers, company, initialLocation, segments);
+                    }
+                }
+            }
+            return flightPlan;
         }
 
         public IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal)
@@ -29,23 +55,40 @@ namespace FlightControlWeb.Data
             var relativeTo = new MyDateTime(date);
             var flights = new List<Flight> {};
 
-            using(var connection = _context._conn)
+            using(var connection = _context.conn)
             {
                 connection.Open();
 
                 var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix + " AND is_external = " + isExternal;
+                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix + " AND is_external = " + Util.BoolToInt(isExternal);
                 using(var reader = cmd.ExecuteReader())
                 {
                     while(reader.Read())
                     {
-                        var fd = new FlightCalcData(reader, connection, relativeTo);
-                        var flight = new Flight(fd.flight_id, fd.longitude, fd.latitude, fd.passengers, fd.company_name, relativeTo, isExternal);
+                        var flight = new Flight(reader, connection, relativeTo);
                         flights.Add(flight);
                     }
                 }
             }
             return flights;
+        }
+
+        public IEnumerable<Segment> GetSegmentsByFlightPk(int id, SqliteConnection connection)
+        {
+            var segments = new List<Segment>{};
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM segments WHERE flight_id = '" + id + "' ORDER BY seg_id ASC";
+            using(var reader = cmd.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    var coord = new Coordinate(At("seg_longitude", reader), At("seg_latitude", reader));
+                    var segment = new Segment(coord, (int)(long) At("timespan", reader));
+                    segments.Add(segment);
+                }
+            }
+            return segments;
         }
 
     }

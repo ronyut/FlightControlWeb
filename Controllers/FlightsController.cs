@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
 using System.Collections.Generic;
+using System;
 
 namespace FlightControlWeb.Controllers
 {
@@ -18,13 +19,13 @@ namespace FlightControlWeb.Controllers
         }
 
 
-        // GET api/FlightPlan?relative_to=<DateTime>
-        [HttpGet("{relative_to}")]
-        public ActionResult <Flight> GetFlightsByTime(string relative_to, bool sync_all)
+        // GET api/FlightPlan?relative_to=<DateTime>&sync_all
+        public ActionResult <Flight> GetFlightsByTime([FromQuery] string relative_to)
         {
-            // @check if sync_all is in URL
-            sync_all = false;
-            var item = _repository.GetFlightsByTime(relative_to, sync_all);
+            var url = new string(this.HttpContext.Request.QueryString.Value);
+            bool isSyncAll = url.IndexOf("sync_all", StringComparison.OrdinalIgnoreCase) >= 0;
+            
+            var item = _repository.GetFlightsByTime(relative_to, isSyncAll);
             return Ok(item);
         }
     }

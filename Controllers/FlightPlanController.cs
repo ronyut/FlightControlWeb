@@ -28,7 +28,7 @@ namespace FlightControlWeb.Controllers
 
         // GET api/FlightPlan/{id}
         [HttpGet("{id}")]
-        public ActionResult <FlightPlan> GetFlightPlanById(int id)
+        public ActionResult <FlightPlan> GetFlightPlanById(string id)
         {
             var item = _repository.GetFlightPlanById(id);
             return Ok(item);

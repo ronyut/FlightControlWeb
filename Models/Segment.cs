@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace FlightControlWeb.Models
 {
@@ -6,13 +6,21 @@ namespace FlightControlWeb.Models
     {
         public double longitude { get; set; }
         public double latitude { get; set; }
-        public int timespan_seconds { get; set; }
+        [JsonProperty("timespan_seconds")]
+        public int timespan { get; set; }
 
-        public Segment (double longitude, double latitude, int timespan_seconds)
+        public Segment(double longitude, double latitude, int timespan)
         {
             this.longitude = longitude;
             this.latitude = latitude;
-            this.timespan_seconds = timespan_seconds;
+            this.timespan = timespan;
+        }
+
+        public Segment(Coordinate coord, int timespan)
+        {
+            this.longitude = coord.longitude;
+            this.latitude = coord.latitude;
+            this.timespan = timespan;
         }
     }
 }

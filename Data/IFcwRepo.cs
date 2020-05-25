@@ -6,7 +6,7 @@ namespace FlightControlWeb.Data
     public interface IFcwRepo
     {
         IEnumerable<FlightPlan> GetAllFlightPlans();
-        FlightPlan GetFlightPlanById(int id);
+        FlightPlan GetFlightPlanById(string id);
         IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal);
     }
 }
