@@ -5,7 +5,7 @@ namespace FlightControlWeb
     public class Response
     {
         public string request { get; set; }
-        [JsonProperty("is_success")]
+        [JsonProperty("success")]
         public bool isSuccess { get; set; }
         public string msg { get; set; }
 

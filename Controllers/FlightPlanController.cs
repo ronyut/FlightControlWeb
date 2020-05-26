@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using System.Text;
+using System;
 
 namespace FlightControlWeb.Controllers
 {
@@ -19,6 +23,7 @@ namespace FlightControlWeb.Controllers
 
 
         // GET api/FlightPlan
+        // @ remove
         [HttpGet]
         public ActionResult<IEnumerable<FlightPlan>> GetAllFlightPlans()
         {
@@ -35,10 +40,10 @@ namespace FlightControlWeb.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Response> PostFlightPlan([FromBody] string jsonString)
+        public ActionResult<Response> PostFlightPlan(FlightPlan flightPlan)
         {
-            var response = _repository.PostFlightPlan(jsonString);
-            return Ok(response);
+            var item = _repository.PostFlightPlan(flightPlan);
+            return Ok(item);
         }
     }
 }

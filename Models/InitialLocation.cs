@@ -1,14 +1,21 @@
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace FlightControlWeb.Models
 {
     public class InitialLocation
     {
+        [Required]
         public double longitude { get; set; }
+
+        [Required]
         public double latitude { get; set; }
+        
+        [Required]
         [JsonProperty("date_time")]
         public string dateTime { get; set; }
 
+        [JsonConstructor]
         public InitialLocation (double longitude, double latitude, string dateTime)
         {
             this.longitude = longitude;
@@ -21,6 +28,12 @@ namespace FlightControlWeb.Models
             this.longitude = coord.longitude;
             this.latitude = coord.latitude;
             this.dateTime = dateTime;
+        }
+
+        override
+        public string ToString()
+        {
+            return "(" + this.latitude + ", " + this.longitude + ") -> " + this.dateTime;
         }
     }
 }

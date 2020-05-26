@@ -9,6 +9,6 @@ namespace FlightControlWeb.Data
         FlightPlan GetFlightPlanById(string id);
         IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal);
         Response DeleteFlightById(string id);
-        Response PostFlightPlan(string id);
+        Response PostFlightPlan(FlightPlan flightPlan);
     }
 }

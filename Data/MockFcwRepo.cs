@@ -50,7 +50,7 @@ namespace FlightControlWeb.Data
             return new Response("DELETE", true, "The flight has been deleted");
         }
 
-        public Response PostFlightPlan(string jsonString)
+        public Response PostFlightPlan(FlightPlan flightPlan)
         {
             return new Response("POST", true, "The flight plan has been added");
         }

@@ -9,11 +9,18 @@ namespace FlightControlWeb.Models
     {
         [JsonIgnore]
         public string flightId { get; set; }
+
+        [Required]
         public int passengers { get; set; }
+        
+        [Required]
         [JsonProperty("company_name")]
         public string company { get; set; }
+        
+        [Required]
         [JsonProperty("initial_location")]
         public InitialLocation initialLocation { get; set; }
+
         [Required]
         public IEnumerable<Segment> segments { get; set; }
 
@@ -51,6 +58,24 @@ namespace FlightControlWeb.Models
         public static string GenerateFlightID()
         {
             return GetRandomConsonant() + GetRandomVowel() + GetRandomConsonant() + GetRandomVowel() + GetRandomDigit() + GetRandomDigit();
+        }
+
+        override
+        public string ToString()
+        {
+            var output = "";
+            output += "Flight ID:" + this.flightId + "\n";
+            output += "Company:" + this.company + "\n";
+            output += "Passengers:" + this.passengers + "\n";
+            output += "Initial location:" + this.initialLocation + "\n";
+            output += "Segments:\n";
+            
+            foreach (var segment in this.segments)
+            {
+                output += "\t" + segment.ToString();
+            }
+
+            return output;
         }
     }
 }
