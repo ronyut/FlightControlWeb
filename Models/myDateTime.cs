@@ -54,7 +54,8 @@ namespace FlightControlWeb.Models
 
         public double MakeUnix()
         {
-            var dateTime = new DateTime(this.year, month, this.day, this.hour, this.minute, this.second, DateTimeKind.Utc);
+            var dateTime = new DateTime(this.year, month, this.day, this.hour, this.minute,
+                                        this.second, DateTimeKind.Utc);
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var unixDateTime = (dateTime.ToUniversalTime() - epoch).TotalSeconds;
             return unixDateTime;
@@ -66,40 +67,38 @@ namespace FlightControlWeb.Models
         }
 
         public void ParseIsoDate(string isoDate) {
-            if (IsIsoDate(isoDate)) {
-                var regex = new Regex(@"(\d+)");
-                var matches = regex.Matches(isoDate);
-                var count = matches.Count;
-                
-                if (count != 6) {
-                    throw new Exception("Invalid DateTime Format");
-                }
+            var regex = new Regex(@"(\d+)");
+            var matches = regex.Matches(isoDate);
+            var count = matches.Count;
+            
+            if (count != 6 || !IsIsoDate(isoDate)) {
+                throw new Exception("Invalid DateTime Format");
+            }
 
-                int i = 1;
-                foreach (Match match in matches)
+            int i = 1;
+            foreach (Match match in matches)
+            {
+                int number = Int32.Parse(match.ToString());
+                switch(i++)
                 {
-                    int number = Int32.Parse(match.ToString());
-                    switch(i++)
-                    {
-                        case 1:
-                            this.year = number;
-                            break;
-                        case 2:
-                            this.month = number;
-                            break;
-                        case 3:
-                            this.day = number;
-                            break;
-                        case 4:
-                            this.hour = number;
-                            break;
-                        case 5:
-                            this.minute = number;
-                            break;
-                        case 6:
-                            this.second = number;
-                            break;
-                    }
+                    case 1:
+                        this.year = number;
+                        break;
+                    case 2:
+                        this.month = number;
+                        break;
+                    case 3:
+                        this.day = number;
+                        break;
+                    case 4:
+                        this.hour = number;
+                        break;
+                    case 5:
+                        this.minute = number;
+                        break;
+                    case 6:
+                        this.second = number;
+                        break;
                 }
             }
         }

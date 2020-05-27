@@ -44,7 +44,8 @@ namespace FlightControlWeb.Models
         [JsonIgnore]
         private SqliteDataReader _reader { get; set; }
 
-        public Flight(string flight_id, double longitude, double latitude, int passengers, string company, MyDateTime dateTime, bool isExternal)
+        public Flight(string flight_id, double longitude, double latitude, int passengers,
+                      string company, MyDateTime dateTime, bool isExternal)
         {
             this.flightId = flight_id;
             this.longitude = longitude;
@@ -89,25 +90,27 @@ namespace FlightControlWeb.Models
             var timePassed = relativeTo.unix - takeoff.unix;
 
             var cmd = _conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM segments WHERE flight_id = "+ this.flightPk +" AND timespan_cdf >= "+ timePassed +" ORDER BY timespan_cdf ASC LIMIT 1";
+            cmd.CommandText = "SELECT * FROM segments WHERE flight_id = "+ this.flightPk + " AND ";
+            cmd.CommandText += "timespan_cdf >= "+ timePassed +" ORDER BY timespan_cdf ASC LIMIT 1";
             using(var reader = cmd.ExecuteReader())
             {
                 while(reader.Read())
                 {
                     var segOrder = (int)(long) At("seg_order", reader);
-                    var segDestination = new Coordinate(At("seg_longitude", reader), At("seg_latitude", reader));
-                    var segTimespan = (int)(long) At("timespan", reader);
+                    var segDest = new Coordinate(At("seg_longitude", reader),
+                                                 At("seg_latitude", reader));
+                    var segTimespan = (double)(long) At("timespan", reader);
                     var sefTimespanCdf = (int)(long) At("timespan_cdf", reader);
 
                     var currentLocation = new Coordinate(0, 0);
                     var startCoord = GetSegmentStart(segOrder - 1);
-                    double timeFraction = (double) (segTimespan - (sefTimespanCdf - timePassed)) / (double) segTimespan;
+                    double timeFrac = (segTimespan - (sefTimespanCdf - timePassed)) / segTimespan;
 
-                    double distanceLongitude = (segDestination.longitude - startCoord.longitude) * timeFraction;
-                    currentLocation.longitude = startCoord.longitude + distanceLongitude;
+                    double distLong = (segDest.longitude - startCoord.longitude) * timeFrac;
+                    currentLocation.longitude = startCoord.longitude + distLong;
 
-                    double distanceLatitude = (segDestination.latitude - startCoord.latitude) * timeFraction;
-                    currentLocation.latitude = startCoord.latitude + distanceLatitude;
+                    double distLat = (segDest.latitude - startCoord.latitude) * timeFrac;
+                    currentLocation.latitude = startCoord.latitude + distLat;
                     
                     // update properties
                     this.longitude = Math.Round(currentLocation.longitude, CoordRound);
@@ -123,23 +126,25 @@ namespace FlightControlWeb.Models
         public Coordinate GetSegmentStart(int segOrder)
         {
             Coordinate coord = null;
-            if (segOrder > 0)
+
+            // If this is the 1st segment, then its start coord is the flight plan's initial coord
+            if (segOrder == 0)
             {
-                var cmd = _conn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM segments WHERE flight_id = "+ this.flightPk +" AND seg_order = "+ segOrder +" LIMIT 1";
-                using(var reader = cmd.ExecuteReader())
-                {
-                    while(reader.Read())
-                    {
-                        coord = new Coordinate(At("seg_longitude", reader), At("seg_latitude", reader));
-                    }
-                }
-            }
-            else
-            {
-                coord = this.initialLocation;
+                return this.initialLocation;
             }
 
+            var cmd = _conn.CreateCommand();
+            cmd.CommandText  = @"SELECT * FROM segments
+                                  WHERE flight_id = "+ this.flightPk +
+                                " AND seg_order = "+ segOrder +" LIMIT 1";
+            using(var reader = cmd.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    coord = new Coordinate(At("seg_longitude", reader), At("seg_latitude", reader));
+                }
+            }
+            
             // Check for possible error
             if (coord == null)
             {

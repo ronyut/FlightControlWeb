@@ -24,7 +24,8 @@ namespace FlightControlWeb.Models
         [Required]
         public IEnumerable<Segment> segments { get; set; }
 
-        public FlightPlan (int passengers, string company, InitialLocation initialLocation, IEnumerable<Segment> segments)
+        public FlightPlan (int passengers, string company, InitialLocation initialLocation,
+                           IEnumerable<Segment> segments)
         {
             this.flightId = GenerateFlightID();
             this.passengers = passengers;
@@ -57,7 +58,8 @@ namespace FlightControlWeb.Models
 
         public static string GenerateFlightID()
         {
-            return GetRandomConsonant() + GetRandomVowel() + GetRandomConsonant() + GetRandomVowel() + GetRandomDigit() + GetRandomDigit();
+            return GetRandomConsonant() + GetRandomVowel() + GetRandomConsonant() +
+                   GetRandomVowel() + GetRandomDigit() + GetRandomDigit();
         }
 
         override

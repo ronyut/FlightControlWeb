@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
 using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
-using System.Text;
-using System;
+using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace FlightControlWeb.Controllers
 {
@@ -14,7 +12,6 @@ namespace FlightControlWeb.Controllers
     public class FlightPlanController : ControllerBase
     {
         private readonly IFcwRepo _repository;
-        //private readonly MockFcwRepo _repository = new MockFcwRepo();
 
         public FlightPlanController(IFcwRepo repository)
         {
@@ -33,7 +30,7 @@ namespace FlightControlWeb.Controllers
 
         // GET api/FlightPlan/{id}
         [HttpGet("{id}")]
-        public ActionResult<FlightPlan> GetFlightPlanById(string id)
+        public async Task<ActionResult<FlightPlan>> GetFlightPlanByIdAsync(string id)
         {
             var item = _repository.GetFlightPlanById(id);
             return Ok(item);

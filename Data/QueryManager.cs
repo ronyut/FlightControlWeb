@@ -17,8 +17,10 @@ namespace FlightControlWeb.Data
         public FlightPlan GetFlightPlanById(string id)
         {
             FlightPlan flightPlan = null;
+
+            // Connection Opened //
             _conn.Open();
-            {
+            
                 var cmd = _conn.CreateCommand();
                 cmd.CommandText = "SELECT * FROM flights WHERE flight_name = '" + id + "' LIMIT 1";
                 using(var reader = cmd.ExecuteReader())
@@ -29,13 +31,15 @@ namespace FlightControlWeb.Data
                         var passengers = (int)(long) At("passengers", reader);
                         var company = (string) At("company", reader);
                         var coord = new Coordinate(At("longitude", reader), At("latitude", reader));
-                        var initialLocation = new InitialLocation(coord, (string) At("takeoff", reader));
+                        var initialLocation = new InitialLocation(coord,
+                                                                  (string) At("takeoff", reader));
                         var segments = GetSegmentsByFlightPk(flightPk);
 
                         flightPlan = new FlightPlan(passengers, company, initialLocation, segments);
                     }
                 }
-            }
+            
+            // Connection Closed //
             _conn.Close();
             
             return flightPlan;
@@ -46,12 +50,15 @@ namespace FlightControlWeb.Data
             var segments = new List<Segment>{};
 
             var cmd = _conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM segments WHERE flight_id = '" + id + "' ORDER BY seg_id ASC";
+            cmd.CommandText  = @"SELECT * FROM segments
+                                 WHERE flight_id = '" + id + "'" +
+                                "ORDER BY seg_id ASC";
             using(var reader = cmd.ExecuteReader())
             {
                 while(reader.Read())
                 {
-                    var coord = new Coordinate(At("seg_longitude", reader), At("seg_latitude", reader));
+                    var coord = new Coordinate(At("seg_longitude", reader),
+                                               At("seg_latitude", reader));
                     var segment = new Segment(coord, (int)(long) At("timespan", reader));
                     segments.Add(segment);
                 }
@@ -69,10 +76,13 @@ namespace FlightControlWeb.Data
         {
             var flights = new List<Flight> {};
 
+            // Connection Opened //
             _conn.Open();
-            {
+            
                 var cmd = _conn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM flights WHERE takeoff_unix <= " + relativeTo.unix + " AND landing_unix >= " + relativeTo.unix;
+                cmd.CommandText = @"SELECT * FROM flights 
+                                    WHERE takeoff_unix <= " + relativeTo.unix +
+                                   " AND landing_unix >= " + relativeTo.unix;
 
                 if (!isExternal)
                 {
@@ -88,7 +98,8 @@ namespace FlightControlWeb.Data
                         flights.Add(flight);
                     }
                 }
-            }
+            
+            // Connection Closed //
             _conn.Close(); 
 
             return flights;
@@ -96,8 +107,9 @@ namespace FlightControlWeb.Data
 
         public void DeleteFlightById(string id)
         {
+            // Connection Opened //
             _conn.Open();
-            {
+            
                 var cmd = _conn.CreateCommand();
                 cmd.CommandText  = "DELETE FROM flights WHERE flight_name = '" + id + "'";
                 var affectedRowsNum = cmd.ExecuteNonQuery();
@@ -105,7 +117,8 @@ namespace FlightControlWeb.Data
                 {
                     throw new Exception("Flight ID does not exist");
                 }
-            }
+            
+            // Connection Closed //
             _conn.Close();
         }
 
@@ -124,13 +137,19 @@ namespace FlightControlWeb.Data
             var takeoff = new MyDateTime(flightPlan.initialLocation.dateTime);
             var landing = new MyDateTime((takeoff.unix + totalTimespan));
 
+            // Connection Opened //
             _conn.Open();
-            {
+           
                 var fp = flightPlan;
                 using(var transaction = _conn.BeginTransaction())
                 {
                     var cmd = _conn.CreateCommand();
-                    cmd.CommandText = "INSERT INTO flights (flight_name, company, passengers, longitude, latitude, takeoff, takeoff_unix, landing_unix) VALUES ('"+ fp.flightId +"', '"+ fp.company +"', "+ fp.passengers +", "+ fp.initialLocation.longitude +", "+ fp.initialLocation.latitude +", '"+ takeoff.sql +"', "+ takeoff.unix +", "+ landing.unix +");";
+                    cmd.CommandText = @"INSERT INTO flights (flight_name, company, passengers,
+                                        longitude, latitude, takeoff, takeoff_unix, landing_unix)
+                                        VALUES ('"+ fp.flightId +"', '"+ fp.company +
+                                        "', "+ fp.passengers +", "+ fp.initialLocation.longitude +
+                                        ", "+ fp.initialLocation.latitude +", '"+ takeoff.sql +
+                                        "', "+ takeoff.unix +", "+ landing.unix +");";
                     cmd.CommandText += "SELECT last_insert_rowid()";
                     var flightPk = (long) cmd.ExecuteScalar();
 
@@ -140,13 +159,22 @@ namespace FlightControlWeb.Data
                     foreach(Segment seg in flightPlan.segments)
                     {
                         cdf += seg.timespan;
-                        cmd.CommandText += "INSERT INTO segments (seg_order, seg_longitude, seg_latitude, timespan, timespan_cdf, flight_id) VALUES ("+ index +", "+ seg.longitude +", "+ seg.latitude +", "+ seg.timespan +", "+ cdf +", "+ flightPk +");";
+                        cmd.CommandText += @"INSERT INTO segments (seg_order, seg_longitude,
+                                            seg_latitude, timespan, timespan_cdf, flight_id)
+                                            VALUES ("+ index +", "+ seg.longitude +
+                                            ", "+ seg.latitude +", "+ seg.timespan +", "+ cdf +
+                                            ", "+ flightPk +");";
                         index++;
                     }
-                    cmd.ExecuteNonQuery();
+                    var affectedRowsNum = cmd.ExecuteNonQuery();
+                    if (affectedRowsNum != index - 1)
+                    {
+                        throw new Exception("Could not post all segments to DB");
+                    }
                     transaction.Commit();
                 }
-            }
+
+            // Connection Closed //
             _conn.Close();
         }
     }

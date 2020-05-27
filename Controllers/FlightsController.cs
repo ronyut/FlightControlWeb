@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
-using System.Collections.Generic;
-using System;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System;
 
 namespace FlightControlWeb.Controllers
 {
@@ -12,18 +13,20 @@ namespace FlightControlWeb.Controllers
     public class FlightsController : ControllerBase
     {
         private readonly IFcwRepo _repository;
-        //private readonly MockFcwRepo _repository = new MockFcwRepo();
+        private readonly HttpClient _httpClient;
 
         public FlightsController(IFcwRepo repository)
         {
             _repository = repository;
+            _httpClient = new HttpClient();
         }
-
 
         // GET api/FlightPlan?relative_to=<DateTime>&sync_all
         [HttpGet]
-        public ActionResult<Flight> GetFlightsByTime([FromQuery] string relative_to)
+        public async Task<ActionResult<Flight>> GetFlightsByTimeAsync([FromQuery]
+                                                                      string relative_to)
         {
+            var html = await _httpClient.GetStringAsync("https://dotnetfoundation.org");
             var url = new string(HttpContext.Request.QueryString.Value);
             bool isSyncAll = url.IndexOf("sync_all", StringComparison.OrdinalIgnoreCase) >= 0;
             var item = _repository.GetFlightsByTime(relative_to, isSyncAll);

@@ -38,8 +38,10 @@ namespace FlightControlWeb.Data
         public IEnumerable<Flight> GetFlightsByTime(string date, bool isExternal)
         {
             var flights = new List<Flight>{
-                new Flight("FOJI88", 38, -38, 1000, "Air France", new MyDateTime("2020-05-25T11:33:00Z"), false),
-                new Flight("POLA11", 22.1, -23.8, 1, "Swiss Air", new MyDateTime("2020-05-25T11:33:01Z"), false),
+                new Flight("FOJI88", 38, -38, 1000, "Air France",
+                           new MyDateTime("2020-05-25T11:33:00Z"), false),
+                new Flight("POLA11", 22.1, -23.8, 1, "Swiss Air",
+                           new MyDateTime("2020-05-25T11:33:01Z"), false),
             };
 
             return flights;
