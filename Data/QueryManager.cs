@@ -93,7 +93,7 @@ namespace FlightControlWeb.Data
                 {
                     while(reader.Read())
                     {
-                        // @ Logic is very bad - we should not pass reader to Flight
+                        // @ Logic seems bad - we should not pass reader and connection to Flight
                         var flight = new Flight(reader, _conn, relativeTo);
                         flights.Add(flight);
                     }
@@ -124,12 +124,23 @@ namespace FlightControlWeb.Data
 
         public void PostFlightPlan(FlightPlan flightPlan)
         {
+            PostFlightPlan(flightPlan, false, null);
+        }
+
+        public void PostFlightPlan(FlightPlan flightPlan, bool isExternal, string id)
+        {
+            if (isExternal)
+            {
+                if (id == null || id == "") throw new Exception("External flight must have ID");
+                flightPlan.flightId = id;
+            }
+            
             // Check that all values are valid 
-            // @ flightPlan.Validate();
+            flightPlan.Validate();
 
             // Calculate total flight span
             var totalTimespan = 0;
-            foreach(Segment segment in flightPlan.segments)
+            foreach (var segment in flightPlan.segments)
             {
                 totalTimespan += segment.timespan;
             }
@@ -145,18 +156,20 @@ namespace FlightControlWeb.Data
                 {
                     var cmd = _conn.CreateCommand();
                     cmd.CommandText = @"INSERT INTO flights (flight_name, company, passengers,
-                                        longitude, latitude, takeoff, takeoff_unix, landing_unix)
+                                        longitude, latitude, takeoff, takeoff_unix, landing_unix,
+                                        is_external)
                                         VALUES ('"+ fp.flightId +"', '"+ fp.company +
                                         "', "+ fp.passengers +", "+ fp.initialLocation.longitude +
                                         ", "+ fp.initialLocation.latitude +", '"+ takeoff.sql +
-                                        "', "+ takeoff.unix +", "+ landing.unix +");";
+                                        "', "+ takeoff.unix +", "+ landing.unix +
+                                        ", "+ isExternal +");";
                     cmd.CommandText += "SELECT last_insert_rowid()";
                     var flightPk = (long) cmd.ExecuteScalar();
 
                     // Handle the segments
                     cmd = _conn.CreateCommand();
                     int index = 1, cdf = 0;
-                    foreach(Segment seg in flightPlan.segments)
+                    foreach (var seg in flightPlan.segments)
                     {
                         cdf += seg.timespan;
                         cmd.CommandText += @"INSERT INTO segments (seg_order, seg_longitude,
@@ -176,6 +189,69 @@ namespace FlightControlWeb.Data
 
             // Connection Closed //
             _conn.Close();
+        }
+
+        public bool IsIgnoredFlight(string id)
+        {
+            bool isIgnored;
+
+            // Connection Opened //
+            _conn.Open();
+            
+                var cmd = _conn.CreateCommand();
+                cmd.CommandText = @"SELECT count(*) FROM flights_ignored
+                                    WHERE flight_name = '"+ id +"'";
+                isIgnored = Util.IntToBool((int)(long) cmd.ExecuteScalar());
+
+            // Connection Closed //
+            _conn.Close(); 
+
+            return isIgnored;
+        }
+
+        public void SetFlightIgnored(string id, bool ignore)
+        {
+            var cmdText = "DELETE FROM flights_ignored WHERE flight_name = '"+ id +"'";
+            if (ignore)
+            {
+                cmdText = "INSERT INTO flights_ignored (flight_name) VALUES('"+ id +"')";
+            }
+
+            // Connection Opened //
+            _conn.Open();
+            
+                var cmd = _conn.CreateCommand();
+                cmd.CommandText = cmdText;
+                cmd.ExecuteNonQuery();
+
+            // Connection Closed //
+            _conn.Close(); 
+        }
+
+        public IEnumerable<Server> GetServers()
+        {
+            var servers = new List<Server>{};
+
+            // Connection Opened //
+            _conn.Open();
+            
+                var cmd = _conn.CreateCommand();
+                cmd.CommandText = @"SELECT * FROM servers";
+                using(var reader = cmd.ExecuteReader())
+                {
+                    while(reader.Read())
+                    {
+                        var key = (string) At("server_key", reader);
+                        var url = (string) At("server_url", reader);
+                        var server = new Server(key, url);
+                        servers.Add(server);
+                    }
+                }
+
+            // Connection Closed //
+            _conn.Close();
+
+            return servers;
         }
     }
 }

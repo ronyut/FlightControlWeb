@@ -12,10 +12,12 @@ namespace FlightControlWeb.Controllers
     public class FlightPlanController : ControllerBase
     {
         private readonly IFcwRepo _repository;
+        private readonly HttpClient _httpClient;
 
         public FlightPlanController(IFcwRepo repository)
         {
             _repository = repository;
+            _httpClient = new HttpClient();
         }
 
 
@@ -32,7 +34,7 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlanByIdAsync(string id)
         {
-            var item = _repository.GetFlightPlanById(id);
+            var item = await _repository.GetFlightPlanByIdAsync(id, _httpClient);
             return Ok(item);
         }
 

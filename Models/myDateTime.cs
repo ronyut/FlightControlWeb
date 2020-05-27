@@ -76,7 +76,7 @@ namespace FlightControlWeb.Models
             }
 
             int i = 1;
-            foreach (Match match in matches)
+            foreach (var match in matches)
             {
                 int number = Int32.Parse(match.ToString());
                 switch(i++)

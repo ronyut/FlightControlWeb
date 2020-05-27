@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -34,6 +35,17 @@ namespace FlightControlWeb.Models
         public string ToString()
         {
             return "(" + this.latitude + ", " + this.longitude + ") -> " + this.timespan;
+        }
+
+        public void Validate()
+        {
+            var coord = new Coordinate(longitude, latitude);
+            coord.Validate();
+
+            if (timespan <= 0)
+            {
+                throw new Exception("Segment timespan must be positive");
+            }
         }
     }
 }

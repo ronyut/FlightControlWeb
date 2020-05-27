@@ -24,5 +24,13 @@ namespace FlightControlWeb.Models
             this.longitude = (double) longitude;
             this.latitude = (double) latitude;
         }
+
+        public void Validate()
+        {
+            if (longitude > 180 || longitude < -180 || latitude > 90 || latitude < -90)
+            {
+                throw new Exception("Invalid coordinate in initial location");
+            }
+        }
     }
 }

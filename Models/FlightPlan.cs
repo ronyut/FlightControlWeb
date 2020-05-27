@@ -79,5 +79,25 @@ namespace FlightControlWeb.Models
 
             return output;
         }
+
+        public void Validate()
+        {
+            if (passengers <= 0)
+            {
+                throw new Exception("Passenger must be a positive number");
+            }
+
+            if (company == null)
+            {
+                throw new Exception("Company name must be given");
+            }
+
+            initialLocation.Validate();
+            
+            foreach (var segment in segments)
+            {
+                segment.Validate();
+            }
+        }
     }
 }

@@ -10,13 +10,17 @@ namespace FlightControlWeb.Models
         // From DB
         [JsonIgnore]
         public int flightPk { get; set; }
-        [JsonProperty(PropertyName = "flight_id")]
+
+        [JsonProperty("flight_id")]
         public string flightId { get; set; }
+
         [JsonProperty("company_name")]
         public string company { get; set; }
         public int passengers { get; set; }
+
         [JsonProperty("is_external")]
         public bool isExternal { get; set; }
+
         [JsonProperty("date_time")]
         public string dateTime { get; set; }
         [JsonIgnore]
@@ -24,7 +28,6 @@ namespace FlightControlWeb.Models
         [JsonIgnore]
         public MyDateTime landing { get; set; }
         [JsonIgnore]
-        [JsonProperty("initial_location")]
         public Coordinate initialLocation { get; set; }
         
         // Calculated
@@ -41,8 +44,15 @@ namespace FlightControlWeb.Models
         
         [JsonIgnore]
         private SqliteConnection _conn { get; set; }
+        
         [JsonIgnore]
         private SqliteDataReader _reader { get; set; }
+
+        [JsonConstructor]
+        public Flight()
+        {
+
+        }
 
         public Flight(string flight_id, double longitude, double latitude, int passengers,
                       string company, MyDateTime dateTime, bool isExternal)
@@ -148,7 +158,7 @@ namespace FlightControlWeb.Models
             // Check for possible error
             if (coord == null)
             {
-                throw new Exception("No segments found for this flight!");
+                throw new Exception("Segment #"+ segOrder +" not found for flight "+ flightId);
             }
 
             return coord;

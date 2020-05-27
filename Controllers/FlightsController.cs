@@ -26,10 +26,8 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<Flight>> GetFlightsByTimeAsync([FromQuery]
                                                                       string relative_to)
         {
-            var html = await _httpClient.GetStringAsync("https://dotnetfoundation.org");
-            var url = new string(HttpContext.Request.QueryString.Value);
-            bool isSyncAll = url.IndexOf("sync_all", StringComparison.OrdinalIgnoreCase) >= 0;
-            var item = _repository.GetFlightsByTime(relative_to, isSyncAll);
+            bool isSyncAll = Request.Query.ContainsKey("sync_all");
+            var item = await _repository.GetFlightsByTimeAsync(relative_to, isSyncAll, _httpClient);
             return Ok(item);
         }
 

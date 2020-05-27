@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -34,6 +35,15 @@ namespace FlightControlWeb.Models
         public string ToString()
         {
             return "(" + this.latitude + ", " + this.longitude + ") -> " + this.dateTime;
+        }
+
+        public void Validate()
+        {
+            var initCoord = new Coordinate(longitude, latitude);
+            initCoord.Validate();
+            
+            // Will throw excpetion if not valid
+            var date = new MyDateTime(dateTime);
         }
     }
 }
