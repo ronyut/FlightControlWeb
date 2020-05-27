@@ -7,6 +7,7 @@ namespace FlightControlWeb.Models
     public class Flight
     {
         public static readonly int CoordRound = 6;
+        
         // From DB
         [JsonIgnore]
         public int flightPk { get; set; }

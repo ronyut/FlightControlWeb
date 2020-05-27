@@ -11,6 +11,7 @@ namespace FlightControlWeb.Data
     {
         private readonly FcwContext _context;
         private QueryManager _queryManager;
+        private HttpClient _httpClient;
 
         /*
          * Function: 
@@ -20,35 +21,17 @@ namespace FlightControlWeb.Data
         {
             _context = context;
             _queryManager = new QueryManager(context.conn);
-
+            _httpClient = new HttpClient();
         }
 
         /*
          * Function: 
          * Description: 
          */
-        public IEnumerable<FlightPlan> GetAllFlightPlans()
-        {
-            throw new Exception("Not implemented!");
-        }
-
-        /*
-         * Function: 
-         * Description: 
-         */
-        public FlightPlan GetFlightPlanById(string id)
-        {
-            return _queryManager.GetFlightPlanById(id);
-        }
-
-        /*
-         * Function: 
-         * Description: 
-         */
-        public async Task<FlightPlan> GetFlightPlanByIdAsync(string id, HttpClient httpClient)
+        public async Task<FlightPlan> GetFlightPlanByIdAsync(string id)
         {
             // Search in internal DB
-            var flightPlan = GetFlightPlanById(id);
+            var flightPlan = _queryManager.GetFlightPlanById(id);
             if (flightPlan != null)
             {
                 return flightPlan;
@@ -69,24 +52,25 @@ namespace FlightControlWeb.Data
                 try
                 {
                     var url = server.url + "/api/FlightPlan/" + id;
-                    string ext = await httpClient.GetStringAsync(url);
+                    string ext = await _httpClient.GetStringAsync(url);
                     flightPlan = JsonConvert.DeserializeObject<FlightPlan>(ext);
 
                     if (flightPlan.segments != null) break;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Problem with server " + server.url + " (" + e +")");
+                    var err = @"Problem occurred while fetching data from
+                                server "+ server.url + " (" + e +")";
+                    Console.WriteLine(err);
                 }
             }
 
             // Stop ignoring flight
             _queryManager.SetFlightIgnored(id, false);
 
-            // Save external flight to DB
+            // No need to save external flight to DB, as it might get deleted and we won't know
             if (flightPlan != null)
             {
-                _queryManager.PostFlightPlan(flightPlan, true, id);
                 return flightPlan;
             }
             
@@ -97,8 +81,7 @@ namespace FlightControlWeb.Data
          * Function: 
          * Description: 
          */
-        public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal,
-                                                                     HttpClient httpClient)
+        public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal)
         {
             var relativeTo = new MyDateTime(date);
             var flights = new List<Flight> {};
@@ -106,11 +89,12 @@ namespace FlightControlWeb.Data
             // Get flights from external servers
             if (isExternal)
             {
-                var externalFlights = await GetFlightsByTimeExternal(relativeTo, httpClient);
+                var externalFlights = await GetExternalFlightsByTime(relativeTo);
                 flights.AddRange(externalFlights);
             }
 
-            flights.AddRange(_queryManager.GetFlightsByTime(relativeTo, isExternal));
+            // Get internal flights
+            flights.AddRange(_queryManager.GetFlightsByTime(relativeTo));
             return flights;
         }
 
@@ -118,11 +102,9 @@ namespace FlightControlWeb.Data
          * Function: 
          * Description: 
          */
-        public async Task<IEnumerable<Flight>> GetFlightsByTimeExternal(MyDateTime relativeTo,
-                                                                        HttpClient httpClient)
+        public async Task<IEnumerable<Flight>> GetExternalFlightsByTime(MyDateTime relativeTo)
         {
             var flights = new List<Flight> {};
-            var temp = new List<Flight> {};
 
             var servers = _queryManager.GetServers();
             foreach (var server in servers)
@@ -130,33 +112,31 @@ namespace FlightControlWeb.Data
                 try
                 {
                     var url = server.url + "/api/Flights?relative_to=" + relativeTo.iso;
-                    Console.WriteLine("@@@ " + url);
-                    string ext = await httpClient.GetStringAsync(url);
+                    string ext = await _httpClient.GetStringAsync(url);
                     var severFlights = JsonConvert.DeserializeObject<IEnumerable<Flight>>(ext);
-
-                    // Count results
-                    temp.AddRange(severFlights);
-                    if (temp.Count == 0) continue;
-                    Console.WriteLine("@@@ Count: " + temp.Count);
-                    temp.Clear();
-
-                    // put in db @@@@
-
-                    // set is_ext = true @@@
 
                     flights.AddRange(severFlights);
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine("Problem with server "+ server.url + " (" + e +")");
+                    var err = @"Problem occurred while fetching data from
+                                server "+ server.url + " (" + e +")";
+                    Console.WriteLine(err);
                 }
             }
+
+            // set all flight as external
+            foreach (var flight in flights)
+            {
+                flight.isExternal = true;
+            }
+
             return flights;
         }
 
         /*
-         * Function: 
-         * Description: 
+         * Function: DeleteFlightById
+         * Description: Deletes a flight and all its segments
          */
         public Response DeleteFlightById(string id)
         {
@@ -166,7 +146,7 @@ namespace FlightControlWeb.Data
             }
             catch (Exception e)
             {
-                return new Response("DELETE", false, e.Message);
+                throw new Exception(e.Message);
             }
 
             return new Response("DELETE", true, "The flight has been successfully deleted");
@@ -174,7 +154,7 @@ namespace FlightControlWeb.Data
 
         /*
          * Function: PostFlightPlan
-         * Description: 
+         * Description: Post a flight plan to DB
          */
         public Response PostFlightPlan(FlightPlan flightPlan)
         {
@@ -184,7 +164,7 @@ namespace FlightControlWeb.Data
             }
             catch (Exception e)
             {
-                return new Response("POST", false, e.Message);
+                throw new Exception(e.Message);
             }
 
             return new Response("POST", true, "Flight plan has been added");

@@ -7,23 +7,10 @@ namespace FlightControlWeb.Data
 {
     public class MockFcwRepo : IFcwRepo
     {
-        public IEnumerable<FlightPlan> GetAllFlightPlans()
+        private HttpClient _httpClient;
+        public MockFcwRepo()
         {
-            var segments = new List<Segment>{
-                new Segment(35, 35, 100),
-                new Segment(36, 36, 20)
-            };
-
-            InitialLocation initialLocation = new InitialLocation(34, 34, "2020-05-22T15:30:00Z");
-
-            var flightPlans = new List<FlightPlan>
-            {
-                new FlightPlan(222, "El Al 0", initialLocation, segments),
-                new FlightPlan(333, "El Al 1", initialLocation, segments),
-                new FlightPlan(444, "El Al 2", initialLocation, segments)
-            };
-
-            return flightPlans;
+            _httpClient = new HttpClient();
         }
 
         public FlightPlan GetFlightPlanById(string id)
@@ -37,8 +24,7 @@ namespace FlightControlWeb.Data
             return new FlightPlan(222, "El Al 0", initialLocation, segments);
         }
 
-        public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal,
-                                                                     HttpClient httpClient)
+        public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal)
         {
             var flights = new List<Flight>{
                 new Flight("FOJI88", 38, -38, 1000, "Air France",
@@ -60,7 +46,7 @@ namespace FlightControlWeb.Data
             return new Response("POST", true, "The flight plan has been added");
         }
 
-        public async Task<FlightPlan> GetFlightPlanByIdAsync(string id, HttpClient httpClient)
+        public async Task<FlightPlan> GetFlightPlanByIdAsync(string id)
         {
             var segments = new List<Segment>{
                 new Segment(35, 35, 100),

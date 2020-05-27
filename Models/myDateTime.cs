@@ -67,12 +67,13 @@ namespace FlightControlWeb.Models
         }
 
         public void ParseIsoDate(string isoDate) {
+            bool error = false;
             var regex = new Regex(@"(\d+)");
             var matches = regex.Matches(isoDate);
             var count = matches.Count;
             
             if (count != 6 || !IsIsoDate(isoDate)) {
-                throw new Exception("Invalid DateTime Format");
+                throw new Exception("Bad datetime format");
             }
 
             int i = 1;
@@ -82,24 +83,33 @@ namespace FlightControlWeb.Models
                 switch(i++)
                 {
                     case 1:
+                        // range years for unix
+                        if (number < 1970 || number > 2037) error = true;
                         this.year = number;
                         break;
                     case 2:
+                        if (number <= 0 || number > 12) error = true;
                         this.month = number;
                         break;
                     case 3:
+                        if (number <= 0 || number > 31) error = true;
                         this.day = number;
                         break;
                     case 4:
+                        if (number < 0 || number > 23) error = true;
                         this.hour = number;
                         break;
                     case 5:
+                        if (number < 0 || number > 59) error = true;
                         this.minute = number;
                         break;
                     case 6:
+                        if (number < 0 || number > 59) error = true;
                         this.second = number;
                         break;
                 }
+
+                if (error) throw new Exception("Bad datetime format");
             }
         }
 

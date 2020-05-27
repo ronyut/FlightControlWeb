@@ -72,7 +72,7 @@ namespace FlightControlWeb.Data
             return reader.GetValue(reader.GetOrdinal(column));
         }
 
-        public IEnumerable<Flight> GetFlightsByTime(MyDateTime relativeTo, bool isExternal)
+        public IEnumerable<Flight> GetFlightsByTime(MyDateTime relativeTo)
         {
             var flights = new List<Flight> {};
 
@@ -82,12 +82,9 @@ namespace FlightControlWeb.Data
                 var cmd = _conn.CreateCommand();
                 cmd.CommandText = @"SELECT * FROM flights 
                                     WHERE takeoff_unix <= " + relativeTo.unix +
-                                   " AND landing_unix >= " + relativeTo.unix;
-
-                if (!isExternal)
-                {
-                    cmd.CommandText += " AND is_external = 0";
-                }
+                                   " AND landing_unix >= " + relativeTo.unix +
+                                   " AND is_external = 0";
+                
 
                 using(var reader = cmd.ExecuteReader())
                 {
@@ -111,7 +108,8 @@ namespace FlightControlWeb.Data
             _conn.Open();
             
                 var cmd = _conn.CreateCommand();
-                cmd.CommandText  = "DELETE FROM flights WHERE flight_name = '" + id + "'";
+                cmd.CommandText  = @"DELETE FROM flights WHERE flight_name = '" + id + "' "+
+                                    "AND is_external = 0";
                 var affectedRowsNum = cmd.ExecuteNonQuery();
                 if (affectedRowsNum != 1)
                 {
