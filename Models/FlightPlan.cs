@@ -88,7 +88,7 @@ namespace FlightControlWeb.Models
         public static string GenerateFlightID()
         {
             return GetRandomConsonant() + GetRandomVowel() + GetRandomConsonant() +
-                   GetRandomVowel() + GetRandomDigit() + GetRandomDigit();
+                   GetRandomVowel() + "-" + GetRandomDigit() + GetRandomDigit();
         }
 
         /*
