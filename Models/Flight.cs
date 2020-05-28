@@ -1,3 +1,9 @@
+/* This class represents a flight.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using System;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
@@ -49,12 +55,18 @@ namespace FlightControlWeb.Models
         [JsonIgnore]
         private SqliteDataReader _reader { get; set; }
 
+        /* 
+        * Ctor
+        */
         [JsonConstructor]
         public Flight()
         {
 
         }
 
+        /* 
+        * Ctor
+        */
         public Flight(string flight_id, double longitude, double latitude, int passengers,
                       string company, MyDateTime dateTime, bool isExternal)
         {
@@ -67,6 +79,9 @@ namespace FlightControlWeb.Models
             this.isExternal = isExternal;
         }
 
+        /* 
+        * Ctor
+        */
         public Flight(SqliteDataReader reader, SqliteConnection connection, MyDateTime relativeTo)
         {
             this._conn = connection;
@@ -86,16 +101,29 @@ namespace FlightControlWeb.Models
             Calculate();
         }
 
+        /*
+         * Function: At
+         * Description: Get the object from the DB by the column name.
+         * Default: reader.
+         */
         public object At(string column)
         {
             return At(column, this._reader);
         }
 
+        /*
+         * Function: At
+         * Description: Get the object from the DB by the column name with a specific reader.
+         */
         public object At(string column, SqliteDataReader reader)
         {
             return reader.GetValue(reader.GetOrdinal(column));
         }
 
+        /*
+         * Function: Calculate
+         * Description: Calculates the coordinates, ETL and angle of the flight.
+         */
         public void Calculate()
         {
             var timePassed = relativeTo.unix - takeoff.unix;
@@ -133,7 +161,11 @@ namespace FlightControlWeb.Models
                 }
             }
         }
-
+        
+        /*
+         * Function: GetSegmentStart
+         * Description: Gets the starting coord of the segment.
+         */
         public Coordinate GetSegmentStart(int segOrder)
         {
             Coordinate coord = null;
@@ -165,19 +197,29 @@ namespace FlightControlWeb.Models
             return coord;
         }
 
+        /*
+         * Function: CalculateAngle
+         * Description: Calculate the flight's angle
+         */
         public double CalculateAngle(Coordinate from, Coordinate to)
         {
             double angle;
             var xDist = to.longitude - from.longitude;
             var yDist = to.latitude - from.latitude;
 
-            if (xDist == 0) {
-                if (yDist > 0) {
+            if (xDist == 0)
+            {
+                if (yDist > 0)
+                {
                     angle = 90;
-                } else {
+                }
+                else
+                {
                     angle = 180;
                 }
-            } else {
+            }
+            else
+            {
                 angle = Math.Atan(yDist / xDist);
                 var add = 0;
 

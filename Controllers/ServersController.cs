@@ -1,6 +1,14 @@
+/* This is a controller for api/servers.
+ * This controller enables posting, deleting and viewing servers.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
+using System.Collections.Generic;
 
 namespace FlightControlWeb.Controllers
 {
@@ -10,13 +18,16 @@ namespace FlightControlWeb.Controllers
     {
         private readonly IFcwRepo _repository;
         
+        /*
+         * Ctor
+         */
         public ServersController(IFcwRepo repository)
         {
             _repository = repository;
         }
 
         [HttpGet]
-        public ActionResult<Response> GetAllServers()
+        public ActionResult<IEnumerable<Server>> GetAllServers()
         {
             var item = _repository.GetAllServers();
             return Ok(item);

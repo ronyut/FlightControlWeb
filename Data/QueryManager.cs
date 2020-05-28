@@ -1,3 +1,9 @@
+/* This class manages all the DB queries.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using System;
 using System.Collections.Generic;
 using FlightControlWeb.Models;
@@ -9,11 +15,27 @@ namespace FlightControlWeb.Data
     {
         private SqliteConnection _conn { get; set; }
 
+        /*
+         * Ctor
+         */
         public QueryManager(SqliteConnection conn)
         {
             this._conn = conn;
         }
 
+        /*
+         * Function: At
+         * Description: Get the object from the DB by the column name.
+         */
+        public object At(string column, SqliteDataReader reader)
+        {
+            return reader.GetValue(reader.GetOrdinal(column));
+        }
+
+        /*
+         * Function: GetFlightPlanById
+         * Description: Gets the FlightPlan from DB by flight ID.
+         */
         public FlightPlan GetFlightPlanById(string id)
         {
             FlightPlan flightPlan = null;
@@ -22,7 +44,8 @@ namespace FlightControlWeb.Data
             _conn.Open();
             
                 var cmd = _conn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM flights WHERE flight_name = '" + id + "' LIMIT 1";
+                cmd.CommandText = @"SELECT * FROM flights
+                                    WHERE flight_name = '" + id + "' LIMIT 1";
                 using(var reader = cmd.ExecuteReader())
                 {
                     while(reader.Read())
@@ -45,6 +68,10 @@ namespace FlightControlWeb.Data
             return flightPlan;
         }
 
+        /*
+         * Function: GetSegmentsByFlightPk
+         * Description: Gets all the segments of a flight by the flight PK.
+         */
         public IEnumerable<Segment> GetSegmentsByFlightPk(int id)
         {
             var segments = new List<Segment>{};
@@ -67,11 +94,10 @@ namespace FlightControlWeb.Data
             return segments;
         }
 
-        public object At(string column, SqliteDataReader reader)
-        {
-            return reader.GetValue(reader.GetOrdinal(column));
-        }
-
+        /*
+         * Function: GetFlightsByTime
+         * Description: Gets all the flight in DB that are active during `relative_to` time.
+         */
         public IEnumerable<Flight> GetFlightsByTime(MyDateTime relativeTo)
         {
             var flights = new List<Flight> {};
@@ -102,6 +128,10 @@ namespace FlightControlWeb.Data
             return flights;
         }
 
+        /*
+         * Function: DeleteFlightById
+         * Description: Deletes a flight by ID.
+         */
         public void DeleteFlightById(string id)
         {
             // Connection Opened //
@@ -120,11 +150,20 @@ namespace FlightControlWeb.Data
             _conn.Close();
         }
 
+        /*
+         * Function: PostFlightPlan
+         * Description: Posts a new flight plan.
+         * Default: non-external flight
+         */
         public void PostFlightPlan(FlightPlan flightPlan)
         {
             PostFlightPlan(flightPlan, false, null);
         }
 
+        /*
+         * Function: PostFlightPlan
+         * Description: Posts a new flight plan.
+         */
         public void PostFlightPlan(FlightPlan flightPlan, bool isExternal, string id)
         {
             if (isExternal)
@@ -133,7 +172,7 @@ namespace FlightControlWeb.Data
                 flightPlan.flightId = id;
             }
             
-            // Check that all values are valid 
+            // Check that all field values are valid 
             flightPlan.Validate();
 
             // Calculate total flight span
@@ -178,7 +217,7 @@ namespace FlightControlWeb.Data
                         index++;
                     }
                     var affectedRowsNum = cmd.ExecuteNonQuery();
-                    if (affectedRowsNum != index - 1)
+                    if (affectedRowsNum != --index)
                     {
                         throw new Exception("Could not post all segments to DB");
                     }
@@ -189,6 +228,11 @@ namespace FlightControlWeb.Data
             _conn.Close();
         }
 
+        /*
+         * Function: IsIgnoredFlight
+         * Description: Check if a searching this flight ID should be ignored if requested by
+                        other servers.
+         */
         public bool IsIgnoredFlight(string id)
         {
             bool isIgnored;
@@ -207,6 +251,10 @@ namespace FlightControlWeb.Data
             return isIgnored;
         }
 
+        /*
+         * Function: SetFlightIgnored
+         * Description: Set a flight to be ignored/not-ignored if requseted by other servers.
+         */
         public void SetFlightIgnored(string id, bool ignore)
         {
             var cmdText = "DELETE FROM flights_ignored WHERE flight_name = '"+ id +"'";
@@ -226,7 +274,11 @@ namespace FlightControlWeb.Data
             _conn.Close(); 
         }
 
-        public IEnumerable<Server> GetServers()
+        /*
+         * Function: GetAllServers
+         * Description: Returns all external servers in DB.
+         */
+        public IEnumerable<Server> GetAllServers()
         {
             var servers = new List<Server>{};
 
@@ -234,7 +286,7 @@ namespace FlightControlWeb.Data
             _conn.Open();
             
                 var cmd = _conn.CreateCommand();
-                cmd.CommandText = @"SELECT * FROM servers";
+                cmd.CommandText = @"SELECT * FROM servers WHERE is_enabled = 1";
                 using(var reader = cmd.ExecuteReader())
                 {
                     while(reader.Read())
@@ -250,6 +302,49 @@ namespace FlightControlWeb.Data
             _conn.Close();
 
             return servers;
+        }
+
+        /*
+         * Function: DeleteServer
+         * Description: Deletes a server by ID from the DB.
+         */
+        public void DeleteServer(string id)
+        {
+            // Connection Opened //
+            _conn.Open();
+            
+                var cmd = _conn.CreateCommand();
+                cmd.CommandText  = @"DELETE FROM servers WHERE server_key = '" + id + "'";
+                var affectedRowsNum = cmd.ExecuteNonQuery();
+                if (affectedRowsNum != 1)
+                {
+                    throw new Exception("Server does not exist in DB");
+                }
+            
+            // Connection Closed //
+            _conn.Close();
+        }
+
+        /*
+         * Function: PostServer
+         * Description: Posts a new server to DB
+         */
+        public void PostServer(Server server)
+        {
+            // Connection Opened //
+            _conn.Open();
+            
+                var cmd = _conn.CreateCommand();
+                cmd.CommandText  = @"INSERT INTO servers (server_key, server_url)
+                                     VALUES('"+ server.key +"', '"+ server.url +"')";
+                var affectedRowsNum = cmd.ExecuteNonQuery();
+                if (affectedRowsNum != 1)
+                {
+                    throw new Exception("Could not add server");
+                }
+            
+            // Connection Closed //
+            _conn.Close();
         }
     }
 }

@@ -1,3 +1,10 @@
+/* This is a controller for api/Flights.
+ * This controller enables deleting and viewing fligths.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
@@ -11,12 +18,15 @@ namespace FlightControlWeb.Controllers
     {
         private readonly IFcwRepo _repository;
 
+        /*
+         * Ctor
+         */
         public FlightsController(IFcwRepo repository)
         {
             _repository = repository;
         }
 
-        // GET api/FlightPlan?relative_to=<DateTime>&sync_all
+        // GET api/Flights?relative_to=<DateTime>&sync_all
         [HttpGet]
         public async Task<ActionResult<Flight>> GetFlightsByTimeAsync([FromQuery]
                                                                       string relative_to)
@@ -26,6 +36,7 @@ namespace FlightControlWeb.Controllers
             return Ok(item);
         }
 
+        // DELETE api/Flights/{id}
         [HttpDelete("{id}")]
         public ActionResult<Response> DeleteFlightById(string id)
         {

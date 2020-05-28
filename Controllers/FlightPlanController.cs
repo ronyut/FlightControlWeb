@@ -1,3 +1,10 @@
+/* This is a controller for api/FlightPlan.
+ * This controller enables posting and viewing a flight plan.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
@@ -11,6 +18,9 @@ namespace FlightControlWeb.Controllers
     {
         private readonly IFcwRepo _repository;
         
+        /*
+         * Ctor
+         */
         public FlightPlanController(IFcwRepo repository)
         {
             _repository = repository;

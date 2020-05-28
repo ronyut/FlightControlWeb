@@ -1,3 +1,10 @@
+/* This is the Sqlite main repository.
+ * It sends all db query requests to the QueryManager class.
+ * 
+ * Author: Rony Utesvky.
+ * Date: May 28, 2020
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -14,8 +21,7 @@ namespace FlightControlWeb.Data
         private HttpClient _httpClient;
 
         /*
-         * Function: 
-         * Description: 
+         * Ctor
          */
         public SqliteFcwRepo(FcwContext context)
         {
@@ -25,8 +31,9 @@ namespace FlightControlWeb.Data
         }
 
         /*
-         * Function: 
-         * Description: 
+         * Function: GetFlightPlanByIdAsync
+         * Description: This asynchronous method checks if the flight ID is present in the DB, and
+         *              if not, it sends an async request to the external servers.
          */
         public async Task<FlightPlan> GetFlightPlanByIdAsync(string id)
         {
@@ -40,27 +47,31 @@ namespace FlightControlWeb.Data
             // Prevent infinite loop that happens due to ping pong between connected servers
             if (_queryManager.IsIgnoredFlight(id))
             {
+                // Stop ignoring flight
                 _queryManager.SetFlightIgnored(id, false);
                 throw new Exception("Preventing infinite loop");
             }
+            // Start ignoring flight
              _queryManager.SetFlightIgnored(id, true);
 
             // Look for the flight ID in external servers
-            var servers = _queryManager.GetServers();
+            var servers = _queryManager.GetAllServers();
             foreach (var server in servers)
             {
                 try
                 {
+                    // Get FlightPlan from external server
                     var url = server.url + "/api/FlightPlan/" + id;
                     string ext = await _httpClient.GetStringAsync(url);
                     flightPlan = JsonConvert.DeserializeObject<FlightPlan>(ext);
 
+                    // If successful, the FlightPlan's fields won't be null
                     if (flightPlan.segments != null) break;
                 }
                 catch (Exception e)
                 {
                     var err = @"Problem occurred while fetching data from
-                                server "+ server.url + " (" + e +")";
+                                server "+ server.url + " (" + e.Message +")";
                     Console.WriteLine(err);
                 }
             }
@@ -68,9 +79,10 @@ namespace FlightControlWeb.Data
             // Stop ignoring flight
             _queryManager.SetFlightIgnored(id, false);
 
-            // No need to save external flight to DB, as it might get deleted and we won't know
-            if (flightPlan != null)
+            // Save external flight to DB, even if it might get deleted and we won't know
+            if (flightPlan.segments != null)
             {
+                _queryManager.PostFlightPlan(flightPlan);
                 return flightPlan;
             }
             
@@ -78,8 +90,10 @@ namespace FlightControlWeb.Data
         }
 
         /*
-         * Function: 
-         * Description: 
+         * Function: GetFlightsByTimeAsync
+         * Description: This method sends an async request to the external servers, and asks for
+                        the relevant flights for `relative_to`, and then it also gets the relevant
+         *              flights in our db.
          */
         public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal)
         {
@@ -99,18 +113,20 @@ namespace FlightControlWeb.Data
         }
 
         /*
-         * Function: 
-         * Description: 
+         * Function: GetExternalFlightsByTime
+         * Description: This method sends an async request to the external servers, and asks for
+                        the relevant flights for `relative_to`.
          */
         public async Task<IEnumerable<Flight>> GetExternalFlightsByTime(MyDateTime relativeTo)
         {
             var flights = new List<Flight> {};
 
-            var servers = _queryManager.GetServers();
+            var servers = _queryManager.GetAllServers();
             foreach (var server in servers)
             {
                 try
                 {
+                    // Send the request and try to get the Flights list
                     var url = server.url + "/api/Flights?relative_to=" + relativeTo.iso;
                     string ext = await _httpClient.GetStringAsync(url);
                     var severFlights = JsonConvert.DeserializeObject<IEnumerable<Flight>>(ext);
@@ -120,12 +136,12 @@ namespace FlightControlWeb.Data
                 catch(Exception e)
                 {
                     var err = @"Problem occurred while fetching data from
-                                server "+ server.url + " (" + e +")";
+                                server "+ server.url + " (" + e.Message +")";
                     Console.WriteLine(err);
                 }
             }
 
-            // set all flight as external
+            // Set all flight as external
             foreach (var flight in flights)
             {
                 flight.isExternal = true;
@@ -154,7 +170,7 @@ namespace FlightControlWeb.Data
 
         /*
          * Function: PostFlightPlan
-         * Description: Post a flight plan to DB
+         * Description: Posts a flight plan to DB
          */
         public Response PostFlightPlan(FlightPlan flightPlan)
         {
@@ -169,5 +185,51 @@ namespace FlightControlWeb.Data
 
             return new Response("POST", true, "Flight plan has been added");
         }
+    
+        /*
+         * Function: PostServer
+         * Description: Posts a new server to DB
+         */
+        public Response PostServer(Server server)
+        {
+            try
+            {
+                _queryManager.PostServer(server);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return new Response("POST", true, "Server added");
+        }
+
+        /*
+         * Function: DeleteServer
+         * Description: Deletes a server by ID from the DB
+         */
+        public Response DeleteServer(string id)
+        {
+            try
+            {
+                _queryManager.DeleteServer(id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return new Response("DELETE", true, "Server deleted");
+        }
+
+        /*
+         * Function: GetAllServers
+         * Description: Returns all the servers in the DB.
+         */
+        public IEnumerable<Server> GetAllServers()
+        {
+            return _queryManager.GetAllServers();
+        }
+
     }
 }
