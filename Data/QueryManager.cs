@@ -116,7 +116,7 @@ namespace FlightControlWeb.Data
                 {
                     while(reader.Read())
                     {
-                        // @ Logic seems bad - we should not pass reader and connection to Flight
+                        // Logic seems problematic - passing reader and connection to Flight
                         var flight = new Flight(reader, _conn, relativeTo);
                         flights.Add(flight);
                     }
@@ -199,7 +199,7 @@ namespace FlightControlWeb.Data
                                         "', "+ fp.passengers +", "+ fp.initialLocation.longitude +
                                         ", "+ fp.initialLocation.latitude +", '"+ takeoff.sql +
                                         "', "+ takeoff.unix +", "+ landing.unix +
-                                        ", "+ isExternal +");";
+                                        ", "+ Util.BoolToInt(isExternal) +");";
                     cmd.CommandText += "SELECT last_insert_rowid()";
                     var flightPk = (long) cmd.ExecuteScalar();
 

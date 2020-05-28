@@ -80,9 +80,9 @@ namespace FlightControlWeb.Data
             _queryManager.SetFlightIgnored(id, false);
 
             // Save external flight to DB, even if it might get deleted and we won't know
-            if (flightPlan.segments != null)
+            if (flightPlan != null && flightPlan.segments != null)
             {
-                _queryManager.PostFlightPlan(flightPlan);
+                _queryManager.PostFlightPlan(flightPlan, true, id);
                 return flightPlan;
             }
             
