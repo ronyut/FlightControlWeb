@@ -1,5 +1,6 @@
 /*
- * script for data in project - containt global variables and function for handling data.
+ * script for data in project - containt global variables and functions
+ * for handling data.
  * written by Yehonatan Sofri in May 2020.
  */
 
@@ -13,19 +14,34 @@ let ISO_REGEX_MODIFIER = /[^.]*/m;
 let ISO_REGEX_FINDER = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/m;
 let DEFAULT_INPUT_MESSAGE = "Drop json";
 let EPSILON = 0.001;
-let INTERVAL = 1000;
-let ALERT_TEMPLATE = "<div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\"><strong>Error - </strong> <span id=\"error-message\"></span><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>" 
-let LI_INTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\"list-group-item list-group-item-action\" data-toggle=\"collapse\"><button type=\"button\" class=\"close close-flight\"> <span>&times;</span></button>";
-let LI_EXTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\"list-group-item list-group-item-action\"data-toggle=\"collapse\">";
+let INTERVAL = 250;
+let ANIMATION_DURATION = 750;
+let MIN_ID_LENGTH = 6;
+let MAX_ID_LENGTH = 10;
+let ALERT_TEMPLATE = "<div class=\"alert alert-warning alert-dismissible fade"
+                     + " show\" role=\"alert\"><strong>Error - </strong> <span"
+                     + " id=\"error-message\"></span><button type=\"button\""
+                     + " class=\"close\" data-dismiss=\"alert\" aria-label=\""
+                     + "Close\"><span aria-hidden=\"true\">&times;</span></"
+                     + "button></div>"
+let LI_INTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\""
+                         + "list-group-item list-group-item-action\" "
+                         + "data-toggle=\"collapse\"><button type=\"button"
+                         + "\" class=\"close close-flight\"> <span>&times;"
+                         + "</span></button>";
+let LI_EXTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\""
+                         + "list-group-item list-group-item-action\"data-toggle"
+                         + "=\"collapse\">";
 let LI_INFIX = ", &nbsp; <strong>";
 let LI_POSTFIX = "</strong></li>";
 let FLIGHT_ID_REGEX = /[a-zA-Z0-9]{6,10}/;
 let HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "DELETE, POST, GET",
-  "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
+  "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Headers,"
+                                   + " Authorization, X-Requested-With",
   "Content-Type": 'application/json'
-}
+};
 let minTimeHeap = null;
 let internalFlightsNumber = 0;
 let externalFlightsNumber = 0;
@@ -39,15 +55,16 @@ let markers = {};
 
 // return true if json miss at least one required field of flightPlan object.
 function flightPlanMissFields(json) {
-  let answer = json.passengers && json.company_name && json.initial_location && json.segments;
+  let answer = json.passengers && json.company_name;
+  answer &= json.initial_location && json.segments;
   
   return !answer;
 }
 
 // return true if json miss at least one required field of flight object.
 function flightMissFields(json) {
-  let halfAnswer = json.passengers && json.company_name && json.longitude && json.latitude;
-  let otherHalfAnswer = json.flight_id && json.date_time;
+  let halfAnswer = json.passengers && json.longitude && json.latitude;
+  let otherHalfAnswer = json.flight_id && json.date_time && json.company_name;
   let answer = json.hasOwnProperty("is_external");
   
   answer &= Boolean(halfAnswer && otherHalfAnswer);
@@ -60,7 +77,7 @@ function validateIsExternal(input) {
 }
 
 function validateFlightId(input) {
-  if (input.length <=10 && input.length >= 6) {
+  if (input.length <= MAX_ID_LENGTH && input.length >= MIN_ID_LENGTH) {
     return FLIGHT_ID_REGEX.test(input);
   }
 
@@ -231,7 +248,7 @@ function pointIsInSegment(point, lineStart, lineEnd) {
   return ((lineLength - (pointStartLength + pointEndLength)) < EPSILON);
 }
 
-// return estimated time left by calculating current position & future segments.
+// return estimated time left by calculating position & future segments.
 function calculateETL(flightPlan, flight) {
   let position = {"latitude": flight.latitude, "longitude":flight.longitude};
   let start = flightPlan.initial_location;

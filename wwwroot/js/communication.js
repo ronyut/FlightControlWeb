@@ -1,5 +1,6 @@
 /*
- * script for communcation operations - functions and helpers for sending ajax requests.
+ * script for communcation operations - functions and helpers for
+ * sending ajax requests.
  * written by Yehonatan Sofri in May 2020.
  */
 
@@ -56,10 +57,14 @@ async function doAjaxPost(message) {
   }
 }
 
-// set relevant uri to get flight of input flightId and call an ajax get function.
+/* set relevant uri to get flight of input flightId and call an ajax
+ * get function.
+ */
 function getFlightObjectPromise(flightId) {
   let flightsPromise = getAllFlightsPromise();
-  let flightPromise = flightsPromise.then(flights => getFlightFromArray(flights, flightId));
+  let flightPromise = flightsPromise.then(flights =>
+                                           getFlightFromArray(flights,
+                                                              flightId));
 
   return flightPromise;
 }

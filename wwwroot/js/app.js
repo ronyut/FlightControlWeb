@@ -1,5 +1,6 @@
 /*
- * script for Air Control App for AP2 course. Synchronize html and events in GUI.
+ * script for Air Control App for AP2 course. Synchronize html and events
+ * in GUI.
  * written by Yehonatan Sofri in May 2020.
  */
 
@@ -57,7 +58,8 @@ function setFlightInfoCard(flightJson) {
 }
 
 /*
- * get flight id and boolean. if boolean is true a delete request sent to server.
+ * get flight id and boolean. if boolean is true a delete request
+ * sent to server.
  * in all cases, remove flight from list and from map.
  */
 function removeFlight(flightId, removeFromServer) {
@@ -196,7 +198,8 @@ function addIconAtCurrentLocation(flightId) {
   try {
     flightPromise.then(flight => addIconAtCurrentLocationHelper(flight));
   } catch (err) {
-    raiseErrorToClient("Problem in getting flight" + flightId + "from Server.");
+    raiseErrorToClient("Problem in getting flight" + flightId
+                        + "from Server.");
   }
 }
 
@@ -206,7 +209,8 @@ function addFlightHelper(flightPlan, flight) {
     let etl = calculateETL(flightPlan, flight)
 
     addFlightToList(flight);
-    addLineToMap(flight.flight_id, flightPlan.initial_location, flightPlan.segments);
+    addLineToMap(flight.flight_id, flightPlan.initial_location,
+                 flightPlan.segments);
     syncEndOfFlight(flight.flight_id, etl);
     addIconAtCurrentLocation(flight.flight_id);
   }
@@ -222,7 +226,8 @@ function addFlight(flight) {
     let flightPlanPromise = getFlightPlanPromise(flight.flight_id);
   
     try {
-      flightPlanPromise.then(flightPlan => addFlightHelper(flightPlan, flight));
+      flightPlanPromise.then(flightPlan => addFlightHelper(flightPlan,
+                                                           flight));
     } catch (err) {
       raiseErrorToClient("Unable to add new flight.")
     }    
@@ -293,7 +298,7 @@ $(function() {
       if (internalFlightsNumber) {
         $("#in-flights-badge").fadeToggle()
       }
-  })
+  });
 });
 
 //handler for clicking on internal flights

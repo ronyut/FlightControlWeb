@@ -77,7 +77,8 @@ function makeMultiLineFromSegments(initial_location, segments) {
 
   if (!mapIsSet) return
 
-  latLngArray.push(getLatLng(initial_location.latitude, initial_location.longitude));
+  latLngArray.push(getLatLng(initial_location.latitude,
+                             initial_location.longitude));
 
   for (coordinate of segments) {
     latLngItem = getLatLng(coordinate.latitude, coordinate.longitude);
@@ -180,7 +181,9 @@ function displayCurrentFlightOnMap(latLng) {
 
     // bounce animation of icon.
     markers[currentFlight].setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(function(){ markers[currentFlight].setAnimation(null); }, 750);
+    setTimeout(function() {
+                 markers[currentFlight].setAnimation(null);
+               }, ANIMATION_DURATION);
   }
 }
 
