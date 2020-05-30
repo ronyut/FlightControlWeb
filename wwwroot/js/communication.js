@@ -15,7 +15,6 @@ function getContent(promise) {
 
 // a generic get from server. 
 async function doAjaxGet(uri) {
-  uri = uri + "&unlimited";
   let resJson, data, res;
   
   try {
@@ -40,7 +39,7 @@ async function doAjaxGet(uri) {
 
 // function for postin flight plan.
 async function doAjaxPost(message) {
-  uri = POST_FLIGHT_PLAN_URI + "&unlimited";
+  uri = POST_FLIGHT_PLAN_URI;
   try {
     let msg = await fetch(POST_FLIGHT_PLAN_URI, {
         "method": 'POST',
@@ -48,7 +47,7 @@ async function doAjaxPost(message) {
         "body": message
       });
 
-      if (masg.status != 200) {
+      if (msg.status != 200) {
         raiseErrorToClient("Server rejected file.");
       }
     }
@@ -109,7 +108,7 @@ function uploadFlightPlan(flightPlanString) {
 
 async function removeFlightFromServer(flightId) {
   try {
-    let msg = await fetch(DELETE_FLIGHT_URI+flightId + "&unlimited", {
+    let msg = await fetch(DELETE_FLIGHT_URI+flightId, {
         "method": 'DELETE',
         "headers": HEADERS
       });

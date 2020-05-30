@@ -4,8 +4,8 @@
  * Date: May 28, 2020
  */
 
-using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace FlightControlWeb.Models
 {
@@ -16,7 +16,7 @@ namespace FlightControlWeb.Models
 
         [Required]
         public double latitude { get; set; }
-        
+
         [Required]
         [JsonProperty("date_time")]
         public string dateTime { get; set; }
@@ -25,21 +25,21 @@ namespace FlightControlWeb.Models
          * Ctor
          */
         [JsonConstructor]
-        public InitialLocation (double longitude, double latitude, string dateTime)
+        public InitialLocation(double longitude, double latitude, string dateTime)
         {
             this.longitude = longitude;
             this.latitude = latitude;
-            this.dateTime = dateTime;
+            this.dateTime = new MyDateTime(dateTime).iso;
         }
 
         /*
          * Ctor
          */
-        public InitialLocation (Coordinate coord, string dateTime)
+        public InitialLocation(Coordinate coord, string dateTime)
         {
             this.longitude = coord.longitude;
             this.latitude = coord.latitude;
-            this.dateTime = dateTime;
+            this.dateTime = new MyDateTime(dateTime).iso;
         }
 
         /*
@@ -60,7 +60,7 @@ namespace FlightControlWeb.Models
         {
             var initCoord = new Coordinate(longitude, latitude);
             initCoord.Validate();
-            
+
             // Will throw excpetion if not valid
             var date = new MyDateTime(dateTime);
         }

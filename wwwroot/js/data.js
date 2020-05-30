@@ -4,10 +4,10 @@
  * written by Yehonatan Sofri in May 2020.
  */
 
-let GET_FLIGHT_PLAN_URI = "http://rony5.atwebpages.com/api/FlightPlan/";
-let GET_FLIGHT_URI = "http://rony5.atwebpages.com/api/Flights?relative_to=";
-let DELETE_FLIGHT_URI = "http://rony5.atwebpages.com/api/Flights/";
-let POST_FLIGHT_PLAN_URI = "http://rony5.atwebpages.com/api/FlightPlan";
+let GET_FLIGHT_PLAN_URI = "api/FlightPlan/";
+let GET_FLIGHT_URI = "api/Flights?relative_to=";
+let DELETE_FLIGHT_URI = "api/Flights/";
+let POST_FLIGHT_PLAN_URI = "api/FlightPlan";
 let BLUE_ICON = "planeIcons/plane-blue.png";
 let RED_ICON = "planeIcons/plane-red.png"
 let ISO_REGEX_MODIFIER = /[^.]*/m;
@@ -55,10 +55,10 @@ let markers = {};
 
 // return true if json miss at least one required field of flightPlan object.
 function flightPlanMissFields(json) {
-  let answer = json.passengers && json.company_name;
-  answer &= json.initial_location && json.segments;
-  
-  return !answer;
+  let halfAnswer = json.passengers && json.company_name;
+  let otherHalf = json.initial_location && json.segments;
+
+  return !(halfAnswer && otherHalf);
 }
 
 // return true if json miss at least one required field of flight object.
@@ -78,7 +78,7 @@ function validateIsExternal(input) {
 
 function validateFlightId(input) {
   if (input.length <= MAX_ID_LENGTH && input.length >= MIN_ID_LENGTH) {
-    return FLIGHT_ID_REGEX.test(input);
+    return (typeof input === 'string');
   }
 
   return false;
@@ -149,6 +149,8 @@ function validateSegments(segments) {
 
 // make sure flight plan json is valid.
 function validateFlightPlan(json) {
+  if (!json) return false;
+
   let allIsGood = true;
 
   allIsGood &= validatePassengers(json.passengers);
