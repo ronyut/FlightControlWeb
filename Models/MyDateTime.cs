@@ -4,9 +4,9 @@
  * Date: May 28, 2020
  */
 
-using Newtonsoft.Json;
 using System;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace FlightControlWeb.Models
 {
@@ -36,15 +36,14 @@ namespace FlightControlWeb.Models
         public MyDateTime(string str)
         {
             ParseIsoDate(str);
-
+            
             this.iso = str;
-            this.unix = (int)MakeUnix();
+            this.unix = (int) MakeUnix();
             this.sql = MakeSql();
 
             if (this.iso == this.sql)
             {
-                String timeString = MakeIso();
-                this.iso = timeString.Replace("/", "-", false, null);
+                this.iso = MakeIso();
             }
         }
 
@@ -65,8 +64,8 @@ namespace FlightControlWeb.Models
         public string MakeIso()
         {
             DateTime begin = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            begin = begin.AddSeconds(this.unix).ToLocalTime();
-            return begin.ToString().Replace(" ", "T") + "Z";
+            begin = begin.AddSeconds(this.unix);
+            return String.Format("{0:yyyy-MM-ddTHH:mm:ssZ}", begin);
         }
 
         /*
@@ -78,7 +77,7 @@ namespace FlightControlWeb.Models
             var dateTime = new DateTime(this.year, month, this.day, this.hour, this.minute,
                                         this.second, DateTimeKind.Utc);
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var unixDateTime = (dateTime.ToUniversalTime() - epoch).TotalSeconds;
+            var unixDateTime = (dateTime - epoch).TotalSeconds;
             return unixDateTime;
         }
 
@@ -88,7 +87,7 @@ namespace FlightControlWeb.Models
          */
         public string MakeSql()
         {
-            return this.iso.Replace("T", " ").Replace("Z", "");
+           return this.iso.Replace("T", " ").Replace("Z", "");
         }
 
         /*
@@ -101,7 +100,7 @@ namespace FlightControlWeb.Models
             var regex = new Regex(@"(\d+)");
             var matches = regex.Matches(isoDate);
             var count = matches.Count;
-
+            
             if (count != 6 || !IsIsoDate(isoDate))
             {
                 throw new Exception("Bad datetime format");
@@ -111,7 +110,7 @@ namespace FlightControlWeb.Models
             foreach (var match in matches)
             {
                 int number = Int32.Parse(match.ToString());
-                switch (i++)
+                switch(i++)
                 {
                     case 1:
                         // year: 1970-2037 (unix range)
