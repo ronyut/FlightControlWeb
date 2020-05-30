@@ -99,10 +99,12 @@ function setAndDisplayFlightCard(flight) {
 
 // get a flight object and display flight on map and flight details card.
 function showFlightHelper(flight) {
-  let latLng = getLatLng(flight.latitude, flight.longitude);
+  if (flight) {
+    let latLng = getLatLng(flight.latitude, flight.longitude);
 
-  setAndDisplayFlightCard(flight);
-  displayCurrentFlightOnMap(latLng);
+    setAndDisplayFlightCard(flight);
+    displayCurrentFlightOnMap(latLng);
+  }
 }
 
 // display flight on GUI.
