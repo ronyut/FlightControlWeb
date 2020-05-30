@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlightControlWeb-master\FlightControlWeb.csproj" />
+    <ProjectReference Include="..\FlightControlWeb.csproj" />
   </ItemGroup>
 
 </Project>
