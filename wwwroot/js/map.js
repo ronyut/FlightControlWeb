@@ -111,15 +111,15 @@ function getIcon(color) {
 
   // settings for optimal size and display of plane icon
   let icon = {
-    "scaledSize": new google.maps.Size(20, 20),
-    "origin": new google.maps.Point(0,0),
-    "anchor": new google.maps.Point(20, 20)
+     "scaledSize": new google.maps.Size(20, 20),
+     "origin": new google.maps.Point(0,0),
+     "anchor": new google.maps.Point(20, 20),
   };
 
   if (color == "blue") {
-    icon.url = BLUE_ICON;
+     icon.url = BLUE_ICON;
   } else {
-    icon.url = RED_ICON;
+     icon.url = RED_ICON;
   }
 
   return icon;
