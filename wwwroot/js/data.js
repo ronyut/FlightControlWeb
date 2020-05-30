@@ -8,8 +8,8 @@ let GET_FLIGHT_PLAN_URI = "api/FlightPlan/";
 let GET_FLIGHT_URI = "api/Flights?relative_to=";
 let DELETE_FLIGHT_URI = "api/Flights/";
 let POST_FLIGHT_PLAN_URI = "api/FlightPlan";
-let BLUE_ICON = "planeIcons/plane-blue.png";
-let RED_ICON = "planeIcons/plane-red.png"
+let BLUE_ICON = "img/planeIcons/plane-blue.png";
+let RED_ICON = "img/planeIcons/plane-red.png"
 let ISO_REGEX_MODIFIER = /[^.]*/m;
 let ISO_REGEX_FINDER = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/m;
 let DEFAULT_INPUT_MESSAGE = "Drop json";
