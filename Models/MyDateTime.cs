@@ -40,6 +40,11 @@ namespace FlightControlWeb.Models
             this.iso = str;
             this.unix = (int) MakeUnix();
             this.sql = MakeSql();
+
+            if (this.iso == this.sql)
+            {
+                this.iso = MakeIso();
+            }
         }
 
         /*
@@ -59,8 +64,8 @@ namespace FlightControlWeb.Models
         public string MakeIso()
         {
             DateTime begin = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            begin = begin.AddSeconds(this.unix).ToLocalTime();
-            return begin.ToString().Replace(" ", "T") + "Z";
+            begin = begin.AddSeconds(this.unix);
+            return String.Format("{0:yyyy-MM-ddTHH:mm:ssZ}", begin);
         }
 
         /*
@@ -72,7 +77,7 @@ namespace FlightControlWeb.Models
             var dateTime = new DateTime(this.year, month, this.day, this.hour, this.minute,
                                         this.second, DateTimeKind.Utc);
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var unixDateTime = (dateTime.ToUniversalTime() - epoch).TotalSeconds;
+            var unixDateTime = (dateTime - epoch).TotalSeconds;
             return unixDateTime;
         }
 

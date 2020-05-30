@@ -29,7 +29,7 @@ namespace FlightControlWeb.Models
         {
             this.longitude = longitude;
             this.latitude = latitude;
-            this.dateTime = dateTime;
+            this.dateTime = new MyDateTime(dateTime).iso;
         }
 
         /*
@@ -39,7 +39,7 @@ namespace FlightControlWeb.Models
         {
             this.longitude = coord.longitude;
             this.latitude = coord.latitude;
-            this.dateTime = dateTime;
+            this.dateTime = new MyDateTime(dateTime).iso;
         }
 
         /*

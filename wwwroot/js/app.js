@@ -1,15 +1,15 @@
 
-let GET_FLIGHT_PLAN_URI = "http://rony5.atwebpages.com/api/FlightPlan/";
-let GET_FLIGHT_URI = "http://rony5.atwebpages.com/api/Flights?relative_to=";
-let DELETE_FLIGHT_URI = "http://rony5.atwebpages.com/api/Flights/";
-let POST_FLIGHT_PLAN_URI = "http://rony5.atwebpages.com/api/FlightPlan";
+let GET_FLIGHT_PLAN_URI = "api/FlightPlan/";
+let GET_FLIGHT_URI = "api/Flights?relative_to=";
+let DELETE_FLIGHT_URI = "api/Flights/";
+let POST_FLIGHT_PLAN_URI = "api/FlightPlan";
 let BLUE_ICON = "planeIcons/plane-blue.png";
 let RED_ICON = "planeIcons/plane-red.png"
 let ISO_REGEX_MODIFIER = /[^.]*/m;
 let ISO_REGEX_FINDER = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/m;
 let DEFAULT_INPUT_MESSAGE = "Choose JSON";
 let EPSILON = 0.001;
-let INTERVAL = 15000;
+let INTERVAL = 1000;
 let ALERT_TEMPLATE = "<div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\"><strong>Error - </strong> <span id=\"error-message\"></span><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>" 
 let LI_INTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\"list-group-item list-group-item-action\" data-toggle=\"collapse\"><button type=\"button\" class=\"close close-flight\"> <span>&times;</span></button>";
 let LI_EXTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\"list-group-item list-group-item-action\"data-toggle=\"collapse\">";
