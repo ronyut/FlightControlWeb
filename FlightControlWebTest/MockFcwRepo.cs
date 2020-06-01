@@ -102,6 +102,9 @@ namespace FlightControlWeb.Data
          */
         public async Task<IEnumerable<Flight>> GetFlightsByTimeAsync(string date, bool isExternal)
         {
+            // dummy await
+            await Task.FromResult(0);
+
             if (isExternal)
             {
                 return GetAllFlightsOutput;
@@ -134,6 +137,9 @@ namespace FlightControlWeb.Data
          */
         public async Task<FlightPlan> GetFlightPlanByIdAsync(string id)
         {
+            // dummy await
+            await Task.FromResult(0);
+
             return GetFlightPlanByIdOutput;
         }
 
