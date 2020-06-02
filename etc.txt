@@ -1,2 +1,15 @@
 205433329, Yehonatan Sofri
 319384657, Rony Utevsky
+
+Our unit tests check the three conrollers (servers, flights and flightPlans) in the server.
+First, we inject a mock DB in the controller constructor,
+And then call a functions in the controller,
+Checking that the answer we get is the same as it is in the mockDB.
+
+operations that were tested:
+posting a new server
+get external servers
+delete a server
+get flightplan by id
+post a flightplan
+delete a flight

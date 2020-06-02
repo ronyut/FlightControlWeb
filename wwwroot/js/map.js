@@ -73,14 +73,13 @@ function getLatLng(latitude, longitude) {
 function makeMultiLineFromSegments(initial_location, segments) {
   let latLngArray = [];
   let latLngItem;
-  let lat, lng;
 
   if (!mapIsSet) return
 
   latLngArray.push(getLatLng(initial_location.latitude,
                              initial_location.longitude));
 
-  for (coordinate of segments) {
+  for (let coordinate of segments) {
     latLngItem = getLatLng(coordinate.latitude, coordinate.longitude);
 
     latLngArray.push(latLngItem);
@@ -138,7 +137,6 @@ function setIconLocation(flightId, lat, lng) {
   if (mapIsSet) {
     let marker = markers[flightId];
     let latLng = {"lat": lat, "lng": lng};
-
     marker.setPosition(latLng);
   }
 }
@@ -157,7 +155,7 @@ function clearMap() {
 
 // get flight id and draw flight plan on map.
 function lineMakingHelper(currentFlight) {
-  let segmentsPromise = getSegments(currentFlight);
+  let segmentsPromise = getSegmentsPromise(currentFlight);
 
   segmentsPromise.then(segs => addLineToMap(currentFlight, segs));
 }

@@ -39,7 +39,6 @@ async function doAjaxGet(uri) {
 
 // function for postin flight plan.
 async function doAjaxPost(message) {
-  uri = POST_FLIGHT_PLAN_URI;
   try {
     let msg = await fetch(POST_FLIGHT_PLAN_URI, {
         "method": 'POST',
@@ -92,15 +91,15 @@ function getFlightPlanPromise(flightId) {
 // set relevant uri and return flight segments of flightId.
 function getSegmentsPromise(flightId) {
     let flightPlanPromise = getFlightPlanPromise(flightId);
-    let segments = null;
-
 
     flightPlanPromise.then(json => {return json.segments;});
 }
 
 function uploadFlightPlan(flightPlanString) {
  if (validateFlightPlanInput(flightPlanString)) {
-    return answer = doAjaxPost(flightPlanString);
+    let answer = doAjaxPost(flightPlanString);
+
+    return answer;
   } else {
    raiseErrorToClient("Invalid Json, couldn't upload.")
   }
@@ -130,7 +129,7 @@ function updateFlightsFromArray(flights) {
       flights = [flights];
     }
 
-    for (flight of flights) {
+    for (let flight of flights) {
       addFlight(flight);
     }
   }

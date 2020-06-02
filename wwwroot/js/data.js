@@ -34,11 +34,9 @@ let LI_EXTERNAL_PREFIX = "<li id=\"template\" type=\"button\" class=\""
                          + "=\"collapse\">";
 let LI_INFIX = ", &nbsp; <strong>";
 let LI_POSTFIX = "</strong></li>";
-let FLIGHT_ID_REGEX = /[a-zA-Z0-9]{6,10}/;
 let HEADERS = {
   "Content-Type": 'application/json'
 };
-let minTimeHeap = null;
 let internalFlightsNumber = 0;
 let externalFlightsNumber = 0;
 let currentFlight = null;
@@ -51,21 +49,45 @@ let markers = {};
 
 // return true if json miss at least one required field of flightPlan object.
 function flightPlanMissFields(json) {
-  let halfAnswer = json.passengers && json.company_name;
-  let otherHalf = json.initial_location && json.segments;
-
-  return !(halfAnswer && otherHalf);
+  if (!Object.prototype.hasOwnProperty.call(json, "passengers")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "company_name")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "initial_location")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "segments")) {
+      return true;
+  }
+  return false;
 }
 
 // return true if json miss at least one required field of flight object.
 function flightMissFields(json) {
-  let halfAnswer = json.passengers && json.longitude && json.latitude;
-  let otherHalfAnswer = json.flight_id && json.date_time && json.company_name;
-  let answer = json.hasOwnProperty("is_external");
-  
-  answer &= Boolean(halfAnswer && otherHalfAnswer);
-
-  return !answer;
+  if (!Object.prototype.hasOwnProperty.call(json, "passengers")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "longitude")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "latitude")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "flight_id")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "date_time")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "company_name")) {
+      return true;
+  }
+  if (!Object.prototype.hasOwnProperty.call(json, "is_external")) {
+      return true;
+  }
+   return false;
 }
 
 function validateIsExternal(input) {
@@ -115,9 +137,9 @@ function validateDateTime(input) {
 function validateInitialLocation(initial_location) {
   let answer = true;
 
-  if (!(initial_location.hasOwnProperty('latitude')
-        && initial_location.hasOwnProperty('longitude')
-        && initial_location.hasOwnProperty('date_time'))) {
+  if (!(Object.prototype.hasOwnProperty.call(initial_location, 'latitude')
+        && Object.prototype.hasOwnProperty.call(initial_location, 'longitude')
+        && Object.prototype.hasOwnProperty.call(initial_location, 'date_time'))) {
     return false;
   }
 
@@ -135,7 +157,7 @@ function validateSegments(segments) {
     return false;
   }
 
-  for (item of segments) {
+  for (let item of segments) {
     answer &= validateLongitude(item.longitude);
     answer &= validateLatitude(item.latitude);
   }
@@ -233,6 +255,10 @@ function progressInSegment(point, start, end) {
   let totalLineDistance = getDistance(start, end);
   let pointToStartDistance = getDistance(point, start);
 
+  if (totalLineDistance === 0) {
+      return 1;
+  }
+
   return (pointToStartDistance / totalLineDistance);
 }
 
@@ -257,15 +283,17 @@ function calculateETL(flightPlan, flight) {
   let isFutureSegment = false;
   let etl = null;
 
-  for (seg of flightPlan.segments) {
+  for (let seg of flightPlan.segments) {
     if (isFutureSegment) {
       etl += seg.timespan_seconds;
     } else if (pointIsInSegment(position, start, seg)) {
       let progress = progressInSegment(position, start, seg);
-      etl = progress * seg.timespan_seconds;
+
+      etl = (1- progress) * seg.timespan_seconds;
       isFutureSegment = true;
     }
 
+    // start of next segment is this one.
     start = seg;
   }
 
@@ -286,7 +314,7 @@ function getFlightFromArray(flights, flightId) {
     flights = [flights];
   }
 
-  for (flight of flights) {
+  for (let flight of flights) {
     let tmp_id = flight.flight_id;
 
     if (tmp_id === flightId) return flight;

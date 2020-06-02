@@ -66,10 +66,11 @@ function removeFlight(flightId, removeFromServer) {
 
   if (flightId == currentFlight) {
     clearView();
+    currentFlight = null;
   }
   if (markers[flightId]) {
     removeFlightFromList(flightId);
-    removeFlightFromMap(flightId);
+      removeFlightFromMap(flightId);
     if (removeFromServer) {
       removeFlightFromServer(flightId);  
     }
@@ -80,7 +81,6 @@ function removeFlight(flightId, removeFromServer) {
 function clickcloseFlight(e) {
   let flightId = $((e.target).closest('li')).attr('id');
   let flightIsDisplayed = (flightId == currentFlight);
-  let ct = e.currentTarget;
 
     //delete only if it's not current displayed flight
     if (!flightIsDisplayed) {
@@ -224,7 +224,7 @@ function addFlight(flight) {
     return;
   }
 
-  if (!markers.hasOwnProperty(flight.flight_id)) {
+  if (!Object.prototype.hasOwnProperty.call(markers, flight.flight_id)) {
     let flightPlanPromise = getFlightPlanPromise(flight.flight_id);
   
     try {
@@ -250,6 +250,10 @@ function raiseErrorToClient(message) {
   $("#error-displayer").show();
 }
 
+function resetInput() {
+    $("#inputGroupFile01").val('');
+}
+
 function initData() {
   $('#in-flights-badge').text(internalFlightsNumber);
   $('#ex-flights-badge').text(externalFlightsNumber);
@@ -262,7 +266,7 @@ function initHideElements() {
 }
 
 // handler for changing content in file element.
-function changeContent(e) {
+function changeInputFileContent(e) {
   let file_name = ($("#inputGroupFile01").prop("files")[0]).name;
 
   $("#input-label").text(file_name);
@@ -271,8 +275,8 @@ function changeContent(e) {
 // called when click on submit button.
 function fileFromUser(e) {
   let file = $("#inputGroupFile01").prop("files")[0];
-
   $("#input-label").text(DEFAULT_INPUT_MESSAGE);
+  resetInput();
 
   let reader = new FileReader();
 
@@ -290,27 +294,9 @@ function fileFromUser(e) {
 //bind event handlers and set interval of update from server
 function initHandlersAndInterval() {
   $("#inputGroupFileAddon01").bind('click', fileFromUser);
-  $("#inputGroupFile01").bind('change', changeContent);
+  $("#inputGroupFile01").bind('change', changeInputFileContent);
   setInterval(updateFlightsFromServer, INTERVAL);
 }
-
-//handler for clicking on internal flights
-$(function() {
-  $("#in-flights-heading").click( function(e) {
-      if (internalFlightsNumber) {
-        $("#in-flights-badge").fadeToggle()
-      }
-  });
-});
-
-//handler for clicking on internal flights
-$(function() {
-  $("#ex-flights-heading").click( function(e) {
-    if (externalFlightsNumber) {
-      $("#ex-flights-badge").fadeToggle();  
-    }
-  })
-});
 
 //main function - initialization and configuration
 $(function () {
