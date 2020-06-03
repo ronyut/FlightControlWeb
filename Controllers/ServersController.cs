@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Models;
 using FlightControlWeb.Data;
 using System.Collections.Generic;
+using System;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace FlightControlWeb.Controllers
 {
@@ -44,6 +46,12 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public ActionResult<Response> PostServer(Server server)
         {
+            var host = "http://" + Request.Host.Value;
+            if (server.url == host || server.url.Contains(host + "/"))
+            {
+                throw new Exception("Cannot refernce to self");
+            }
+
             var item = _repository.PostServer(server);
             return Ok(item);
         }
