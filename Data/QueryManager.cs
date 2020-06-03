@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FlightControlWeb.Models;
 using Microsoft.Data.Sqlite;
 
@@ -331,6 +332,20 @@ namespace FlightControlWeb.Data
          */
         public void PostServer(Server server)
         {
+            
+            // check if URL and key are valid
+            if (server.url == "" || server.url == null || server.key == "" || server.key == null)
+            {
+                throw new Exception("Key and URL must not be empty");
+            }
+
+            // check if URL begins with `http`
+            var regex = new Regex(@"^http:\/\/.+$");
+            if (regex.Matches(server.url).Count == 0)
+            {
+                throw new Exception("URL must begin with http://");
+            }
+           
             // Connection Opened //
             _conn.Open();
             
